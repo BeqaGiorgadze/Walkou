@@ -10,6 +10,14 @@ A native iOS app (SwiftUI, iOS 17+) for walking and running toward a step goal.
 3. **Follow the path.** You get a live map, turn-by-turn voice directions, off-route alerts with a dashed detour back to the route, and live steps, distance, time and pace. Everything keeps working with the screen locked.
 4. **Hit the goal: "YOU ROCK!"** A celebration screen appears with *"Go the extra mile, you can do it!"*. You can keep going or finish.
 
+**💎 Gem Trail.** Every route comes with gems to collect:
+- 🔷 **Common** (1 pt) every ~350 m.
+- 💜 **Rare** (5 pts), one or two per route.
+- 🟡 **Legendary** (10 pts) at the finish.
+- 💚 **Bonus** gems (3 pts) a short detour off the route, showing the extra steps.
+
+Walk within ~25 m of a gem to collect it (not counted above 25 km/h). Free walks spawn gems ahead of you, and at halfway a gold gem appears at your start. Points add up to levels (Walker → Explorer → Pathfinder → Trailblazer → Legend), and the collection shelf shows everything you've found. Gem artwork lives in `Assets.xcassets/Gems`, and sounds in `Resources/Sounds`.
+
 Workouts are saved on the device (SwiftData) and appear under **Activity**. They can also be saved to Apple Health (see below).
 
 ## Running it

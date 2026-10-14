@@ -45,6 +45,26 @@ enum Haptics {
         notification.prepare()
     }
 
+    static func gem(_ kind: GemKind) {
+        switch kind {
+        case .common:
+            impact.impactOccurred(intensity: 0.8)
+        case .legendary:
+            notification.notificationOccurred(.success)
+            notification.prepare()
+        default:
+            heavy.impactOccurred()
+            heavy.prepare()
+        }
+        impact.prepare()
+    }
+
+    private static let heavy: UIImpactFeedbackGenerator = {
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.prepare()
+        return generator
+    }()
+
     static func tap() {
         impact.impactOccurred()
         impact.prepare()

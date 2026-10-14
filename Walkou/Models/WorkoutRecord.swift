@@ -20,6 +20,11 @@ final class WorkoutRecord {
     var routeName: String?
     @Attribute(.externalStorage) var trackData: Data?
     var savedToHealth: Bool
+    // Gem Trail (defaults keep older saved workouts readable)
+    var gemPoints: Int = 0
+    var gemsAvailable: Int = 0
+    var bonusSteps: Int = 0
+    var gemTallyData: Data? = nil
 
     init(
         id: UUID = UUID(),
@@ -35,7 +40,10 @@ final class WorkoutRecord {
         elevationGain: Double,
         routeName: String?,
         track: [CLLocationCoordinate2D],
-        savedToHealth: Bool = false
+        savedToHealth: Bool = false,
+        gemTally: GemTally = GemTally(),
+        gemsAvailable: Int = 0,
+        bonusSteps: Int = 0
     ) {
         self.id = id
         self.startDate = startDate
@@ -51,12 +59,17 @@ final class WorkoutRecord {
         self.routeName = routeName
         self.trackData = CoordinateCoding.encode(track)
         self.savedToHealth = savedToHealth
+        self.gemPoints = gemTally.points
+        self.gemsAvailable = gemsAvailable
+        self.bonusSteps = bonusSteps
+        self.gemTallyData = gemTally.encoded()
     }
 
     var activity: ActivityType { ActivityType(rawValue: activityRaw) ?? .walk }
     var mode: WorkoutMode { WorkoutMode(rawValue: modeRaw) ?? .free }
     var goalReached: Bool { steps >= goalSteps }
     var track: [CLLocationCoordinate2D] { CoordinateCoding.decode(trackData) }
+    var gemTally: GemTally { GemTally.decode(gemTallyData) }
 
     var title: String {
         let hour = Calendar.current.component(.hour, from: startDate)

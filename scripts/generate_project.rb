@@ -44,7 +44,7 @@ app_refs.each do |ref|
   case File.extname(ref.path)
   when '.swift'
     app.source_build_phase.add_file_reference(ref)
-  when '.xcassets'
+  when '.xcassets', '.wav'
     app.resources_build_phase.add_file_reference(ref)
   end
 end

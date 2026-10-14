@@ -1,7 +1,7 @@
 import SwiftUI
 import MapKit
 
-/// Shows three routes that match the step goal and lets the user pick one.
+/// Shows three routes that match the step goal, with their gems, and lets the user pick one.
 struct RouteSuggestionsView: View {
     let plan: WorkoutPlan
 
@@ -14,6 +14,7 @@ struct RouteSuggestionsView: View {
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
+    @State private var placingBonusFor: Set<UUID> = []
 
     private var selectedRoute: PlannedRoute? {
         routes.first { $0.id == selectedID } ?? routes.first
@@ -41,26 +42,63 @@ struct RouteSuggestionsView: View {
                 if routes.isEmpty { await load() }
             }
             .onChange(of: selectedID) { _, _ in
-                focusOnSelectedRoute()
+                frameSelectedRoute(animated: true)
+                placeBonusGemsIfNeeded()
             }
     }
 
     // MARK: - Map
 
     private var map: some View {
-        Map(position: $camera) {
+        // No rotation, so the direction arrows always point the right way.
+        Map(position: $camera, interactionModes: [.pan, .zoom]) {
             UserAnnotation()
 
             ForEach(routes.filter { $0.id != selectedRoute?.id }) { route in
                 MapPolyline(coordinates: route.coordinates)
-                    .stroke(route.color.opacity(0.4), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                    .stroke(route.color.opacity(0.45), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
             }
 
             if let route = selectedRoute {
+                // Bonus detours under the route line.
+                ForEach(route.gems.filter { !$0.detourPath.isEmpty }) { gem in
+                    MapPolyline(coordinates: gem.detourPath)
+                        .stroke(Color(hex: 0x1FB863), style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: [1, 7]))
+                }
+
                 MapPolyline(coordinates: route.coordinates)
                     .stroke(route.color.opacity(0.25), style: StrokeStyle(lineWidth: 16, lineCap: .round, lineJoin: .round))
                 MapPolyline(coordinates: route.coordinates)
                     .stroke(route.color, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+
+                ForEach(directionArrows(for: route)) { arrow in
+                    Annotation("", coordinate: arrow.coordinate, anchor: .center) {
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 9, weight: .black))
+                            .foregroundStyle(route.color)
+                            .frame(width: 18, height: 18)
+                            .background(.white, in: Circle())
+                            .rotationEffect(.degrees(arrow.bearing))
+                    }
+                    .annotationTitles(.hidden)
+                }
+
+                ForEach(route.gems) { gem in
+                    Annotation("", coordinate: gem.coordinate, anchor: .center) {
+                        VStack(spacing: 2) {
+                            GemImage(kind: gem.kind, size: gem.kind.mapSize)
+                            if let steps = gem.detourSteps {
+                                Text("+\(Format.steps(steps)) steps")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(Color(hex: 0x1FB863), in: Capsule())
+                            }
+                        }
+                    }
+                    .annotationTitles(.hidden)
+                }
 
                 if let start = route.start {
                     Annotation("Start", coordinate: start) {
@@ -76,7 +114,6 @@ struct RouteSuggestionsView: View {
         }
         .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll))
         .mapControls {
-            MapCompass()
             MapScaleView()
         }
     }
@@ -85,6 +122,10 @@ struct RouteSuggestionsView: View {
 
     private var bottomPanel: some View {
         VStack(spacing: 14) {
+            if let route = selectedRoute {
+                gemPreviewPill(route)
+            }
+
             if !routes.isEmpty {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 12) {
@@ -126,6 +167,22 @@ struct RouteSuggestionsView: View {
         .padding(.top, 14)
         .padding(.bottom, 8)
         .background(.regularMaterial)
+    }
+
+    private func gemPreviewPill(_ route: PlannedRoute) -> some View {
+        let pendingBonus = route.bonusGemsPlaced ? 0 : GemPlanner.bonusCount(forDistance: route.distance)
+        let count = route.gems.count + pendingBonus
+        let points = route.gemPoints + pendingBonus * GemKind.bonus.points
+        return HStack(spacing: 6) {
+            GemImage(kind: .common, size: 18, glow: false)
+            Text("\(count) gems on this \(plan.mode == .loop ? "loop" : "route") · up to \(points) pts")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white)
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 14)
+        .padding(.vertical, 7)
+        .background(Theme.gemInk.opacity(0.92), in: Capsule())
     }
 
     @ViewBuilder
@@ -179,29 +236,80 @@ struct RouteSuggestionsView: View {
         }
 
         do {
-            let found = try await RoutePlanner().suggestions(from: origin, plan: plan)
-            withAnimation(.snappy) {
-                routes = found
-                selectedID = found.first?.id
+            let found = try await RoutePlanner().suggestions(from: origin, plan: plan).map { route in
+                var route = route
+                route.gems = GemPlanner.routeGems(for: route)
+                return route
             }
-            focusOnSelectedRoute()
+            placingBonusFor = []
+            routes = found
+            selectedID = found.first?.id
+            // Let the map lay out with its new content before moving the camera, otherwise the
+            // change can be dropped while the map is still following the user's location.
+            try? await Task.sleep(for: .milliseconds(150))
+            frameSelectedRoute(animated: false)
+            placeBonusGemsIfNeeded()
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 
-    private func focusOnSelectedRoute() {
+    private func placeBonusGemsIfNeeded() {
+        guard let route = selectedRoute, !route.bonusGemsPlaced, !placingBonusFor.contains(route.id) else { return }
+        placingBonusFor.insert(route.id)
+        let stride = plan.activity.strideLength
+        Task {
+            let bonus = await GemPlanner.bonusGems(for: route, strideLength: stride)
+            if let index = routes.firstIndex(where: { $0.id == route.id }) {
+                withAnimation(.snappy) {
+                    routes[index].gems.append(contentsOf: bonus)
+                    routes[index].bonusGemsPlaced = true
+                }
+            }
+            placingBonusFor.remove(route.id)
+        }
+    }
+
+    /// Fits the selected route (and you) into the visible part of the map.
+    private func frameSelectedRoute(animated: Bool) {
         guard let route = selectedRoute, !route.coordinates.isEmpty else { return }
-        let rect = MKPolyline(coordinates: route.coordinates, count: route.coordinates.count).boundingMapRect
-        // Pad generously, with extra room at the bottom for the route cards.
-        let padded = MKMapRect(
-            x: rect.minX - rect.width * 0.2,
-            y: rect.minY - rect.height * 0.25,
-            width: rect.width * 1.4,
-            height: rect.height * 1.9
+        var points = route.coordinates
+        if let here = model.location.lastLocation?.coordinate { points.append(here) }
+        let lats = points.map(\.latitude), lons = points.map(\.longitude)
+        guard let minLat = lats.min(), let maxLat = lats.max(), let minLon = lons.min(), let maxLon = lons.max() else { return }
+        let latSpan = max(0.004, (maxLat - minLat) * 1.5)
+        let lonSpan = max(0.004, (maxLon - minLon) * 1.4)
+        let region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2),
+            span: MKCoordinateSpan(latitudeDelta: latSpan, longitudeDelta: lonSpan)
         )
-        withAnimation(.easeInOut(duration: 0.6)) {
-            camera = .rect(padded)
+        if animated {
+            withAnimation(.easeInOut(duration: 0.5)) { camera = .region(region) }
+        } else {
+            camera = .region(region)
+        }
+    }
+
+    private struct Arrow: Identifiable {
+        let id: Int
+        let coordinate: CLLocationCoordinate2D
+        let bearing: Double
+    }
+
+    /// Small arrows along the route showing which way it goes.
+    private func directionArrows(for route: PlannedRoute) -> [Arrow] {
+        let tracker = RouteTracker(route: route)
+        let total = tracker.totalDistance
+        guard total > 200 else { return [] }
+        let count = min(8, max(3, Int(total / 600)))
+        // Offset by half a gem spacing so arrows sit between gems.
+        return (0..<count).compactMap { index in
+            let along = total * (Double(index) + 0.5) / Double(count) + GemPlanner.spacing / 2
+            guard along < total - 30,
+                  let point = tracker.coordinate(atDistance: along),
+                  let before = tracker.coordinate(atDistance: along - 12),
+                  let after = tracker.coordinate(atDistance: along + 12) else { return nil }
+            return Arrow(id: index, coordinate: point, bearing: Geo.bearing(from: before, to: after))
         }
     }
 }
@@ -236,6 +344,15 @@ private struct RouteCard: View {
                 MetricTile(title: "Steps", value: "~\(Format.steps(steps))")
                 MetricTile(title: "Time", value: Format.durationEstimate(plan.activity.estimatedDuration(forDistance: route.distance)))
             }
+            Rectangle().fill(Theme.separator).frame(height: 1)
+            HStack(spacing: 10) {
+                gemCount(.common, "\(route.gemCount(.common))")
+                gemCount(.rare, "\(route.gemCount(.rare))")
+                gemCount(.legendary, "\(route.gemCount(.legendary))")
+                let bonus = route.bonusGemsPlaced ? route.gemCount(.bonus) : GemPlanner.bonusCount(forDistance: route.distance)
+                if bonus > 0 { gemCount(.bonus, "+\(bonus)") }
+                Spacer(minLength: 0)
+            }
         }
         .padding(16)
         .background(Theme.card, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -244,6 +361,13 @@ private struct RouteCard: View {
                 .strokeBorder(isSelected ? route.color : .clear, lineWidth: 2.5)
         )
         .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private func gemCount(_ kind: GemKind, _ value: String) -> some View {
+        HStack(spacing: 3) {
+            GemImage(kind: kind, size: 20, glow: false)
+            Text(value).font(.system(size: 14, weight: .bold))
+        }
     }
 
     private func differenceLabel(_ difference: Double) -> String {

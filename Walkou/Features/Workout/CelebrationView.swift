@@ -67,7 +67,7 @@ struct CelebrationView: View {
 /// Lightweight falling confetti drawn with Canvas.
 struct ConfettiView: View {
     var count = 90
-    private let colors: [Color] = [.white, Color(hex: 0xFFD25A), Theme.mint, Color(hex: 0xFF6FA8), Theme.green]
+    let colors: [Color] = [.white, Color(hex: 0xFFD25A), Theme.mint, Color(hex: 0xFF6FA8), Theme.green]
     @State private var start = Date()
 
     var body: some View {

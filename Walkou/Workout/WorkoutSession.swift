@@ -45,6 +45,13 @@ final class WorkoutSession: Identifiable {
     var showHalfwayCard = false
     var showCelebration = false
 
+    // Gem Trail
+    private(set) var gems: [Gem] = []
+    private(set) var gemTally = GemTally()
+    /// Latest collect, drives the pop-and-fly animation.
+    private(set) var lastCollect: GemCollectEvent?
+    private(set) var goldGemAtStart = false
+
     private(set) var voiceEnabled: Bool
     let offRouteAlertsEnabled: Bool
 
@@ -63,6 +70,9 @@ final class WorkoutSession: Identifiable {
     @ObservationIgnored private var lastRecorded: CLLocation?
     @ObservationIgnored private var lastDetourRequest: Date?
     @ObservationIgnored private var countdownTask: Task<Void, Never>?
+    @ObservationIgnored private var lastGemSpawnDistance: Double = -250
+    @ObservationIgnored private var isSpawningGem = false
+    @ObservationIgnored private var nextFreeGemID = GemPlanner.freeIDBase
 
     init(
         plan: WorkoutPlan,
@@ -79,7 +89,11 @@ final class WorkoutSession: Identifiable {
         self.voiceEnabled = voiceEnabled
         self.offRouteAlertsEnabled = offRouteAlertsEnabled
         voice.isEnabled = voiceEnabled
-        if let route { setGuidedRoute(route) }
+        if let route {
+            setGuidedRoute(route)
+            gems = route.gems.isEmpty ? GemPlanner.routeGems(for: route) : route.gems
+            if !route.bonusGemsPlaced { placeBonusGems(on: route) }
+        }
     }
 
     // MARK: - Derived values
@@ -96,6 +110,18 @@ final class WorkoutSession: Identifiable {
     var remainingSteps: Int { max(0, plan.goalSteps - steps) }
 
     var calories: Double { distance / 1000 * plan.activity.kilocaloriesPerKilometer }
+
+    var gemPoints: Int { gemTally.points }
+
+    var collectedGemCount: Int { gems.filter(\.isCollected).count }
+
+    /// Extra steps taken for collected bonus detours.
+    var bonusSteps: Int { gems.filter { $0.isCollected }.compactMap(\.detourSteps).reduce(0, +) }
+
+    /// Gems available per haul kind, for the summary ("11/12").
+    func gemsAvailable(_ kind: GemKind) -> Int { gems.filter { $0.kind.haulKind == kind }.count }
+
+    func gemsCollected(_ kind: GemKind) -> Int { gems.filter { $0.isCollected && $0.kind.haulKind == kind }.count }
 
     var distanceBackToStart: Double? {
         guard let start = startCoordinate, let here = currentLocation?.coordinate else { return nil }
@@ -256,8 +282,10 @@ final class WorkoutSession: Identifiable {
             }
             currentLocation = location
             updateNavigation(with: location)
+            checkGems(at: location)
         }
         refreshSteps()
+        spawnFreeWalkGemIfNeeded()
     }
 
     private func record(_ location: CLLocation) {
@@ -300,7 +328,13 @@ final class WorkoutSession: Identifiable {
             halfwayReached = true
             if plan.mode == .free {
                 showHalfwayCard = true
-                voice.say("Halfway there! If you turn around now, you'll finish your goal right back where you started.")
+                if let start = startCoordinate, (distanceBackToStart ?? 0) > 60 {
+                    gems.append(GemPlanner.goldGemAtStart(start))
+                    goldGemAtStart = true
+                }
+                voice.say(goldGemAtStart
+                    ? "Halfway there! A gold gem just appeared at your start. Head back to grab it and finish your goal."
+                    : "Halfway there! If you turn around now, you'll finish your goal right back where you started.")
                 NotificationService.notifyIfInBackground(
                     title: "Halfway there! 🎯",
                     body: "Turn around now to finish your \(Format.steps(plan.goalSteps)) steps back at your start."
@@ -376,6 +410,63 @@ final class WorkoutSession: Identifiable {
         }
     }
 
+    // MARK: - Gems
+
+    private func placeBonusGems(on route: PlannedRoute) {
+        let stride = plan.activity.strideLength
+        Task {
+            let bonus = await GemPlanner.bonusGems(for: route, strideLength: stride)
+            let existing = Set(gems.map(\.id))
+            gems.append(contentsOf: bonus.filter { !existing.contains($0.id) })
+        }
+    }
+
+    private func checkGems(at location: CLLocation) {
+        guard phase == .active, !gems.isEmpty else { return }
+        // Gems only count on foot: ignore fixes faster than 25 km/h.
+        if location.speed > 7 { return }
+        let radius = 25 + min(15, max(0, location.horizontalAccuracy - 10))
+        let progress = tracker.map(\.progress)
+        for index in gems.indices where !gems[index].isCollected {
+            let gem = gems[index]
+            guard Geo.distance(location.coordinate, gem.coordinate) <= radius else { continue }
+            // On-route gems are reached in order, so a loop's finish gem isn't grabbed at the start.
+            if let along = gem.distanceIntoRoute, plannedRoute != nil, guidedRoute?.id == plannedRoute?.id {
+                guard let progress, progress >= along - 40 else { continue }
+            }
+            collect(at: index)
+        }
+    }
+
+    private func collect(at index: Int) {
+        gems[index].isCollected = true
+        let kind = gems[index].kind
+        gemTally[kind] += 1
+        lastCollect = GemCollectEvent(kind: kind, points: kind.points)
+        Haptics.gem(kind)
+        SoundEffects.play(.forGem(kind))
+        if kind == .legendary && goldGemAtStart && gems[index].distanceIntoRoute == nil {
+            goldGemAtStart = false
+        }
+    }
+
+    private func spawnFreeWalkGemIfNeeded() {
+        guard plan.mode == .free, phase == .active, !isSpawningGem,
+              let here = currentLocation, distance - lastGemSpawnDistance >= 280 else { return }
+        let waiting = gems.filter { !$0.isCollected && $0.kind != .legendary }.count
+        guard waiting < 3 else { return }
+        isSpawningGem = true
+        lastGemSpawnDistance = distance
+        let id = nextFreeGemID
+        nextFreeGemID += 1
+        Task {
+            if let gem = await GemPlanner.freeWalkGem(near: here, id: id) {
+                gems.append(gem)
+            }
+            isSpawningGem = false
+        }
+    }
+
     private func requestDetourIfNeeded(from location: CLLocation, tracker: RouteTracker) {
         let now = Date()
         if let lastDetourRequest, now.timeIntervalSince(lastDetourRequest) < 45 { return }
@@ -401,6 +492,13 @@ final class WorkoutSession: Identifiable {
             return String(format: "%.1f miles", meters / unit.metersPerUnit)
         }
     }
+}
+
+/// One collected gem, used to trigger the collect animation.
+struct GemCollectEvent: Equatable, Identifiable {
+    let id = UUID()
+    let kind: GemKind
+    let points: Int
 }
 
 private extension String {

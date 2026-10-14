@@ -12,6 +12,9 @@ struct WorkoutSummaryView: View {
 
     @State private var saved = false
     @State private var healthStatus: HealthStatus = .idle
+    @State private var lifetimePointsBefore = 0
+    @State private var levelUp: GemLevel?
+    @State private var showCollection = false
 
     private enum HealthStatus: Equatable {
         case idle
@@ -34,6 +37,16 @@ struct WorkoutSummaryView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
                 }
                 goalCard
+                if !session.gems.isEmpty {
+                    GemHaulCard(
+                        collected: { session.gemsCollected($0) },
+                        available: { session.gemsAvailable($0) },
+                        points: session.gemPoints,
+                        bonusSteps: session.bonusSteps,
+                        bonusDetours: session.gems.filter { $0.isCollected && $0.detourSteps != nil }.count,
+                        lifetimePoints: lifetimePointsBefore + session.gemPoints
+                    )
+                }
                 stats
                 healthRow
             }
@@ -50,6 +63,30 @@ struct WorkoutSummaryView: View {
                 .background(Theme.background.opacity(0.95).ignoresSafeArea(edges: .bottom))
         }
         .task { await persist() }
+        .overlay {
+            if let levelUp {
+                LevelUpView(
+                    level: levelUp,
+                    points: lifetimePointsBefore + session.gemPoints,
+                    onDone: { withAnimation(.easeInOut) { self.levelUp = nil } },
+                    onCollection: {
+                        withAnimation(.easeInOut) { self.levelUp = nil }
+                        showCollection = true
+                    }
+                )
+                .transition(.opacity.combined(with: .scale(scale: 1.05)))
+            }
+        }
+        .sheet(isPresented: $showCollection) {
+            NavigationStack {
+                GemCollectionView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showCollection = false }
+                        }
+                    }
+            }
+        }
     }
 
     // MARK: - Sections
@@ -161,7 +198,10 @@ struct WorkoutSummaryView: View {
     // MARK: - Saving
 
     private func persist() async {
-        guard !saved, hasData, let start = session.startDate else { return }
+        guard !saved else { return }
+        let earlier = (try? modelContext.fetch(FetchDescriptor<WorkoutRecord>())) ?? []
+        lifetimePointsBefore = earlier.reduce(0) { $0 + $1.gemPoints }
+        guard hasData, let start = session.startDate else { return }
         saved = true
         let end = session.endDate ?? Date()
 
@@ -177,10 +217,22 @@ struct WorkoutSummaryView: View {
             calories: session.calories,
             elevationGain: session.elevationGain,
             routeName: session.plannedRoute?.name,
-            track: session.track.map(\.coordinate)
+            track: session.track.map(\.coordinate),
+            gemTally: session.gemTally,
+            gemsAvailable: session.gems.count,
+            bonusSteps: session.bonusSteps
         )
         modelContext.insert(record)
         try? modelContext.save()
+
+        let before = GemLevel.forPoints(lifetimePointsBefore)
+        let after = GemLevel.forPoints(lifetimePointsBefore + session.gemPoints)
+        if after.number > before.number {
+            Task {
+                try? await Task.sleep(for: .milliseconds(900))
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { levelUp = after }
+            }
+        }
 
         guard saveToHealth else { return }
         healthStatus = .saving

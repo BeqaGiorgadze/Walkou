@@ -174,7 +174,12 @@ struct WorkoutDetailView: View {
                             value: Format.pace(distance: workout.distanceMeters, duration: workout.duration, unit: unit) + " /\(unit.abbreviation)")
                     StatRow(symbol: "flame", title: "Calories", value: Format.calories(workout.calories))
                     StatRow(symbol: "mountain.2", title: "Elevation Gain", value: Format.elevation(workout.elevationGain, unit: unit),
-                            showsDivider: workout.savedToHealth)
+                            showsDivider: workout.savedToHealth || workout.gemsAvailable > 0)
+                    if workout.gemsAvailable > 0 {
+                        StatRow(symbol: "diamond.fill", title: "Gems",
+                                value: "\(workout.gemTally.total)/\(workout.gemsAvailable) · +\(workout.gemPoints) pts",
+                                showsDivider: workout.savedToHealth)
+                    }
                     if workout.savedToHealth {
                         StatRow(symbol: "heart.fill", title: "Apple Health", value: "Saved", showsDivider: false)
                     }

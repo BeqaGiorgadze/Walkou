@@ -37,6 +37,12 @@ struct ActiveWorkoutView: View {
                 bottomPanel
             }
 
+            if let event = session.lastCollect {
+                GemCollectBurst(event: event)
+                    .offset(y: -90)
+                    .id(event.id)
+            }
+
             if case .countdown(let value) = session.phase {
                 CountdownOverlay(value: value)
                     .transition(.opacity)
@@ -92,8 +98,16 @@ struct ActiveWorkoutView: View {
                 freeBanner
             }
 
+            if !session.gems.isEmpty {
+                HStack {
+                    Spacer()
+                    GemCounterPill(collected: session.collectedGemCount, total: session.gems.count, points: session.gemPoints)
+                }
+            }
+
             if session.showHalfwayCard {
                 HalfwayCard(
+                    goldGemWaiting: session.goldGemAtStart,
                     isLoading: session.isFindingWayBack,
                     onGuideBack: { session.guideBackToStart() },
                     onDismiss: { withAnimation { session.showHalfwayCard = false } }
@@ -273,6 +287,18 @@ private struct WorkoutMap: View {
                     .stroke(Theme.mint, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
             }
 
+            ForEach(session.gems.filter { !$0.isCollected && !$0.detourPath.isEmpty }) { gem in
+                MapPolyline(coordinates: gem.detourPath)
+                    .stroke(Color(hex: 0x3EE08A), style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: [1, 7]))
+            }
+
+            ForEach(session.gems.filter { !$0.isCollected }) { gem in
+                Annotation("", coordinate: gem.coordinate, anchor: .center) {
+                    MapGem(gem: gem)
+                }
+                .annotationTitles(.hidden)
+            }
+
             if let detour = session.detour {
                 MapPolyline(coordinates: detour.coordinates)
                     .stroke(Theme.orange, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round, dash: [1, 10]))
@@ -387,7 +413,31 @@ private struct InfoBanner: View {
     }
 }
 
+/// A gem on the live map. The gold gem waiting at your start pulses.
+private struct MapGem: View {
+    let gem: Gem
+    @State private var pulse = false
+
+    var body: some View {
+        ZStack {
+            if gem.kind == .legendary && gem.distanceIntoRoute == nil {
+                Circle()
+                    .fill(Color(hex: 0xFFC53D).opacity(0.22))
+                    .overlay(Circle().strokeBorder(Color(hex: 0xFFC53D).opacity(0.5), lineWidth: 1.5))
+                    .frame(width: 96, height: 96)
+                    .scaleEffect(pulse ? 1 : 0.55)
+                    .opacity(pulse ? 0.2 : 1)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 1.4).repeatForever(autoreverses: false)) { pulse = true }
+                    }
+            }
+            GemImage(kind: gem.kind, size: gem.kind.mapSize)
+        }
+    }
+}
+
 private struct HalfwayCard: View {
+    let goldGemWaiting: Bool
     let isLoading: Bool
     var onGuideBack: () -> Void
     var onDismiss: () -> Void
@@ -406,7 +456,9 @@ private struct HalfwayCard: View {
                 }
                 .accessibilityLabel("Keep exploring")
             }
-            Text("Turn around now and you'll hit your goal right back where you started.")
+            Text(goldGemWaiting
+                 ? "A gold gem just appeared at your start. Head back to grab it and finish your goal at home."
+                 : "Turn around now and you'll hit your goal right back where you started.")
                 .font(.system(size: 15))
                 .foregroundStyle(.white.opacity(0.9))
             ArrowCapsuleButton(title: isLoading ? "Finding the way…" : "Guide me back", action: onGuideBack)

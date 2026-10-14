@@ -17,6 +17,12 @@ struct HomeView: View {
                 VStack(spacing: 16) {
                     header
                     todayCard
+                    NavigationLink {
+                        GemCollectionView()
+                    } label: {
+                        GemLevelCard(points: lifetimeGemPoints, recentKinds: recentGemKinds)
+                    }
+                    .buttonStyle(.plain)
                     startCard
                     weekCard
                     recentCard
@@ -175,6 +181,23 @@ struct HomeView: View {
     }
 
     // MARK: - Data
+
+    private var lifetimeGemPoints: Int {
+        workouts.reduce(0) { $0 + $1.gemPoints }
+    }
+
+    /// Gem kinds from recent workouts, rarest first, for the level card.
+    private var recentGemKinds: [GemKind] {
+        var kinds: [GemKind] = []
+        for workout in workouts.prefix(10) {
+            let tally = workout.gemTally
+            for kind in [GemKind.legendary, .heart, .amber, .rare, .bonus, .common] where tally[kind] > 0 && !kinds.contains(kind) {
+                kinds.append(kind)
+            }
+            if kinds.count >= 5 { break }
+        }
+        return kinds
+    }
 
     private var workoutStepsToday: Int {
         workouts.filter { Calendar.current.isDateInToday($0.startDate) }.reduce(0) { $0 + $1.steps }

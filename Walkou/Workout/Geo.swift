@@ -25,6 +25,16 @@ enum Geo {
         return CLLocationCoordinate2D(latitude: lat2.degrees, longitude: lon2.degrees)
     }
 
+    /// Initial bearing from a to b in degrees (0 = north, clockwise).
+    static func bearing(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
+        let lat1 = a.latitude.radians
+        let lat2 = b.latitude.radians
+        let dLon = (b.longitude - a.longitude).radians
+        let y = sin(dLon) * cos(lat2)
+        let x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(dLon)
+        return (atan2(y, x).degrees + 360).truncatingRemainder(dividingBy: 360)
+    }
+
     /// Cumulative distance at every vertex of a polyline (first element is 0).
     static func cumulativeDistances(_ coordinates: [CLLocationCoordinate2D]) -> [Double] {
         guard !coordinates.isEmpty else { return [] }

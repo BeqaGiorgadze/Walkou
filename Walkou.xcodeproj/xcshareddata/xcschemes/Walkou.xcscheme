@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0C20E75A34590BFB5819A5E4"
+               BlueprintIdentifier = "CE44C773E06D9E9410FEF44D"
                BuildableName = "Walkou.app"
                BlueprintName = "Walkou"
                ReferencedContainer = "container:Walkou.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "856A22A96031CBEE1125D442"
+               BlueprintIdentifier = "2ED22837762B3DB8A8BEB694"
                BuildableName = "WalkouTests.xctest"
                BlueprintName = "WalkouTests"
                ReferencedContainer = "container:Walkou.xcodeproj">
@@ -44,7 +44,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C20E75A34590BFB5819A5E4"
+            BlueprintIdentifier = "CE44C773E06D9E9410FEF44D"
             BuildableName = "Walkou.app"
             BlueprintName = "Walkou"
             ReferencedContainer = "container:Walkou.xcodeproj">
@@ -55,7 +55,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "856A22A96031CBEE1125D442"
+               BlueprintIdentifier = "2ED22837762B3DB8A8BEB694"
                BuildableName = "WalkouTests.xctest"
                BlueprintName = "WalkouTests"
                ReferencedContainer = "container:Walkou.xcodeproj">
@@ -77,7 +77,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C20E75A34590BFB5819A5E4"
+            BlueprintIdentifier = "CE44C773E06D9E9410FEF44D"
             BuildableName = "Walkou.app"
             BlueprintName = "Walkou"
             ReferencedContainer = "container:Walkou.xcodeproj">
@@ -94,7 +94,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C20E75A34590BFB5819A5E4"
+            BlueprintIdentifier = "CE44C773E06D9E9410FEF44D"
             BuildableName = "Walkou.app"
             BlueprintName = "Walkou"
             ReferencedContainer = "container:Walkou.xcodeproj">
