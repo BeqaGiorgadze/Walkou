@@ -250,8 +250,8 @@ struct PillPicker<Option: Hashable & Identifiable>: View {
             ForEach(options) { option in
                 let isSelected = option == selection
                 Button {
-                    withAnimation(.snappy) { selection = option }
                     Haptics.tap()
+                    selection = option
                 } label: {
                     HStack(spacing: 6) {
                         if let symbol { Image(systemName: symbol(option)) }
@@ -273,5 +273,7 @@ struct PillPicker<Option: Hashable & Identifiable>: View {
         }
         .padding(4)
         .background(Theme.cardSecondary, in: Capsule())
+        // Animate only the sliding pill, not every view that depends on the selection.
+        .animation(.snappy(duration: 0.25), value: selection)
     }
 }

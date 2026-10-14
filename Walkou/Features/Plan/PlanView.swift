@@ -74,8 +74,8 @@ struct PlanView: View {
                 HStack(spacing: 8) {
                     ForEach(presets, id: \.self) { preset in
                         Button {
-                            withAnimation(.snappy) { goalSteps = preset }
                             Haptics.tap()
+                            goalSteps = preset
                         } label: {
                             Text(preset >= 1000 ? "\(preset / 1000)K" : "\(preset)")
                                 .font(.system(size: 15, weight: .semibold))
@@ -87,6 +87,7 @@ struct PlanView: View {
                         .buttonStyle(.plain)
                     }
                 }
+                .animation(.snappy(duration: 0.2), value: goalSteps)
             }
 
             HStack(spacing: 0) {
@@ -152,14 +153,15 @@ struct PlanView: View {
                     modeCard(option)
                 }
             }
+            .animation(.snappy(duration: 0.2), value: mode)
         }
     }
 
     private func modeCard(_ option: WorkoutMode) -> some View {
         let isSelected = option == mode
         return Button {
-            withAnimation(.snappy) { mode = option }
             Haptics.tap()
+            mode = option
         } label: {
             VStack(alignment: .leading, spacing: 10) {
                 Image(systemName: option == .free ? activity.symbol : option.symbol)

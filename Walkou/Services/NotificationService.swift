@@ -23,15 +23,30 @@ enum NotificationService {
 
 @MainActor
 enum Haptics {
+    // Reused and pre-warmed: creating a generator per tap stalls the main thread for a frame or two.
+    private static let impact: UIImpactFeedbackGenerator = {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        return generator
+    }()
+    private static let notification: UINotificationFeedbackGenerator = {
+        let generator = UINotificationFeedbackGenerator()
+        generator.prepare()
+        return generator
+    }()
+
     static func success() {
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        notification.notificationOccurred(.success)
+        notification.prepare()
     }
 
     static func warning() {
-        UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        notification.notificationOccurred(.warning)
+        notification.prepare()
     }
 
     static func tap() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        impact.impactOccurred()
+        impact.prepare()
     }
 }
