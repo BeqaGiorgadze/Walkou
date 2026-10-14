@@ -1,0 +1,677 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0229E3240B2F44CA7B7397CB /* PlannedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D72EA4CA7898DC4096CF621C /* PlannedRoute.swift */; };
+		031A598E1A670AE4B92FBB7D /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE05E9A533882E1E86E1675 /* WorkoutSummaryView.swift */; };
+		0A23D165DBC2F2ACA97BEC86 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92C2989542FC8CA823CA9DA /* SettingsView.swift */; };
+		0E3B421F2A94DB5373338F93 /* WorkoutRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B641F9EA4F2E58626AB303 /* WorkoutRecord.swift */; };
+		0FA40EDB61123170657791AC /* WalkouApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0645884D62072E17737A5429 /* WalkouApp.swift */; };
+		111678FB7C99F80BA970CF05 /* PlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9EAA86F4F592EABB7618CDE /* PlanView.swift */; };
+		25CEEA5D0A4DFC69A1F96235 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E56A2FBAD89ED0755AF389 /* AppModel.swift */; };
+		293258BBE96C792B418C3438 /* PedometerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E61442399FB6E98B898D18C /* PedometerService.swift */; };
+		2D9405D20E0CB52280E303B9 /* RouteTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0414C0D393216322A53D10F /* RouteTrackerTests.swift */; };
+		2EF2B0EDFC3D3CF1672CC907 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89A1D45398D9B67229859A37 /* Assets.xcassets */; };
+		315F298465A730B97760426F /* WorkoutFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9A0CF7599039A71F135CBA /* WorkoutFlowView.swift */; };
+		34802E6EFE1B8CF8F77ED90B /* ActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B8EBC79B5A7B65BC240F823 /* ActivityType.swift */; };
+		3697A6DA3094D8A3B0D694B4 /* RouteSuggestionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE404E4E839F315BFDD46EC9 /* RouteSuggestionsView.swift */; };
+		3AE7E2A5CDFBA9947D17F6AE /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE05B5F157BF7D8F2CA2DDA /* Theme.swift */; };
+		3BD246C39455E81EC21B7DC2 /* Geo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA293292DE41D043422085D /* Geo.swift */; };
+		4FDAFD9A0F91067F3B4539BD /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E137400756C5C80429E3E5A7 /* WorkoutSession.swift */; };
+		6C927ADF3518D3ED9E0B5206 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBA4310983D21945C8E1831E /* OnboardingView.swift */; };
+		7B26FEC15C1E7076B98E28A4 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = C61CDA44C65BACB40A2268C7 /* Components.swift */; };
+		887B48919EC7797F748881ED /* RouteTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D08B7A65FD8189D22E9E62 /* RouteTracker.swift */; };
+		99981E0BA201572AE456EDC7 /* VoiceCoach.swift in Sources */ = {isa = PBXBuildFile; fileRef = F646B4577C318361F71716FA /* VoiceCoach.swift */; };
+		ABB8FC77CBF636CA8CA4B28A /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229DEFDA8ACE048AEB2B478D /* HistoryView.swift */; };
+		BA966265F579EF7AEE97530C /* CelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43CC2EFE025564E5FAF668FF /* CelebrationView.swift */; };
+		BF0B0D271D4D1FB166D2C364 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9601A636A9331895419A8799 /* LocationService.swift */; };
+		E39ACA469B0D721FBB55447E /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45332011908AD117AB4E3614 /* NotificationService.swift */; };
+		E460A07C098466F13DB9F0C2 /* DistanceUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DE024067BCE60AA84EC631 /* DistanceUnit.swift */; };
+		EA416B3C979303F24066EE59 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974E3255373CAED8F1B9386D /* HomeView.swift */; };
+		EBD79880D664E66B8AAAAFD4 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D397D7F7C0EEF5A9BFC42699 /* ActiveWorkoutView.swift */; };
+		F50E9BA8EAD1E320BA6A515C /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96798A209AA2A3B179D8C7D8 /* HealthKitService.swift */; };
+		F97438D4C21DEE98303C1CBC /* RoutePlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05FF39B09C3F15EFAF5A3B /* RoutePlanner.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		927722A978095F4DED7ED719 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 12092FE61237552C8EFB05F6 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CF47210DF27374CF181963AD;
+			remoteInfo = Walkou;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0645884D62072E17737A5429 /* WalkouApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WalkouApp.swift; sourceTree = "<group>"; };
+		12E56A2FBAD89ED0755AF389 /* AppModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		1B8EBC79B5A7B65BC240F823 /* ActivityType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActivityType.swift; sourceTree = "<group>"; };
+		229DEFDA8ACE048AEB2B478D /* HistoryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		2BE05E9A533882E1E86E1675 /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
+		3E61442399FB6E98B898D18C /* PedometerService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PedometerService.swift; sourceTree = "<group>"; };
+		3EA9AD4528DF2A5BD61004DC /* WalkouHealthKit.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WalkouHealthKit.entitlements; sourceTree = "<group>"; };
+		43CC2EFE025564E5FAF668FF /* CelebrationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CelebrationView.swift; sourceTree = "<group>"; };
+		45332011908AD117AB4E3614 /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		52B641F9EA4F2E58626AB303 /* WorkoutRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutRecord.swift; sourceTree = "<group>"; };
+		55D08B7A65FD8189D22E9E62 /* RouteTracker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteTracker.swift; sourceTree = "<group>"; };
+		6918E3A16CF0AD97BE369B20 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		804B01F20AD12EA0ECC4E597 /* Walkou.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Walkou.entitlements; sourceTree = "<group>"; };
+		89A1D45398D9B67229859A37 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8AA293292DE41D043422085D /* Geo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Geo.swift; sourceTree = "<group>"; };
+		9601A636A9331895419A8799 /* LocationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		96798A209AA2A3B179D8C7D8 /* HealthKitService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
+		974E3255373CAED8F1B9386D /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		9FF1316F1839A832572DDF0C /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+		AC9A0CF7599039A71F135CBA /* WorkoutFlowView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutFlowView.swift; sourceTree = "<group>"; };
+		ADE05B5F157BF7D8F2CA2DDA /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		AF05FF39B09C3F15EFAF5A3B /* RoutePlanner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoutePlanner.swift; sourceTree = "<group>"; };
+		BA1612B5B6ED8CB82F7C8A43 /* WalkouTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WalkouTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBA4310983D21945C8E1831E /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		BCC040EC9B8BA8B2E510FB51 /* Walkou.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Walkou.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C61CDA44C65BACB40A2268C7 /* Components.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		C9EAA86F4F592EABB7618CDE /* PlanView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlanView.swift; sourceTree = "<group>"; };
+		D397D7F7C0EEF5A9BFC42699 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
+		D72EA4CA7898DC4096CF621C /* PlannedRoute.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlannedRoute.swift; sourceTree = "<group>"; };
+		D8DE024067BCE60AA84EC631 /* DistanceUnit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DistanceUnit.swift; sourceTree = "<group>"; };
+		E137400756C5C80429E3E5A7 /* WorkoutSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutSession.swift; sourceTree = "<group>"; };
+		EE404E4E839F315BFDD46EC9 /* RouteSuggestionsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteSuggestionsView.swift; sourceTree = "<group>"; };
+		F0414C0D393216322A53D10F /* RouteTrackerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteTrackerTests.swift; sourceTree = "<group>"; };
+		F646B4577C318361F71716FA /* VoiceCoach.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceCoach.swift; sourceTree = "<group>"; };
+		F92C2989542FC8CA823CA9DA /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0BE68906C1807008DA11DA5F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2C0CF0CC3FA90709DF3380A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0ED56322FB8D46D0CC46D6BD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1CB548A35063ED0DAA16AC48 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				974E3255373CAED8F1B9386D /* HomeView.swift */,
+			);
+			name = Home;
+			path = Home;
+			sourceTree = "<group>";
+		};
+		1EAC99DC209DF009D8D5FFDA /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				96798A209AA2A3B179D8C7D8 /* HealthKitService.swift */,
+				9601A636A9331895419A8799 /* LocationService.swift */,
+				45332011908AD117AB4E3614 /* NotificationService.swift */,
+				3E61442399FB6E98B898D18C /* PedometerService.swift */,
+				AF05FF39B09C3F15EFAF5A3B /* RoutePlanner.swift */,
+				F646B4577C318361F71716FA /* VoiceCoach.swift */,
+			);
+			name = Services;
+			path = Services;
+			sourceTree = "<group>";
+		};
+		206A5F8004F6AA7682783B07 /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				C9EAA86F4F592EABB7618CDE /* PlanView.swift */,
+				EE404E4E839F315BFDD46EC9 /* RouteSuggestionsView.swift */,
+			);
+			name = Plan;
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		2EEEDCD83F577416A0B9FFD7 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				C61CDA44C65BACB40A2268C7 /* Components.swift */,
+				ADE05B5F157BF7D8F2CA2DDA /* Theme.swift */,
+			);
+			name = DesignSystem;
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		35A268AE6F877AB8CDFBCC71 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				89A1D45398D9B67229859A37 /* Assets.xcassets */,
+				6918E3A16CF0AD97BE369B20 /* Info.plist */,
+				804B01F20AD12EA0ECC4E597 /* Walkou.entitlements */,
+				3EA9AD4528DF2A5BD61004DC /* WalkouHealthKit.entitlements */,
+			);
+			name = Resources;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		3BAE556A661AF2F75AE21B07 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				12E56A2FBAD89ED0755AF389 /* AppModel.swift */,
+				0645884D62072E17737A5429 /* WalkouApp.swift */,
+			);
+			name = App;
+			path = App;
+			sourceTree = "<group>";
+		};
+		4983F1CB42606A82F8ACFA37 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				BBA4310983D21945C8E1831E /* OnboardingView.swift */,
+			);
+			name = Onboarding;
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		4D21FC64521CD9CBC09B5043 = {
+			isa = PBXGroup;
+			children = (
+				0ED56322FB8D46D0CC46D6BD /* Frameworks */,
+				F8055AF888F853DC5C8DD949 /* Products */,
+				AD3E9E897C21281649528F25 /* Walkou */,
+				AF1BD947488EF8A157D7262A /* WalkouTests */,
+				9FF1316F1839A832572DDF0C /* README.md */,
+			);
+			sourceTree = "<group>";
+		};
+		73626482D1E7C2EE082CEDD4 /* Workout */ = {
+			isa = PBXGroup;
+			children = (
+				D397D7F7C0EEF5A9BFC42699 /* ActiveWorkoutView.swift */,
+				43CC2EFE025564E5FAF668FF /* CelebrationView.swift */,
+				AC9A0CF7599039A71F135CBA /* WorkoutFlowView.swift */,
+				2BE05E9A533882E1E86E1675 /* WorkoutSummaryView.swift */,
+			);
+			name = Workout;
+			path = Workout;
+			sourceTree = "<group>";
+		};
+		87FCA622CD921320BC953320 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				9DC34F774B88D628008B9918 /* History */,
+				1CB548A35063ED0DAA16AC48 /* Home */,
+				4983F1CB42606A82F8ACFA37 /* Onboarding */,
+				206A5F8004F6AA7682783B07 /* Plan */,
+				F6EDE0DD1DC5F0C7C0066C88 /* Settings */,
+				73626482D1E7C2EE082CEDD4 /* Workout */,
+			);
+			name = Features;
+			path = Features;
+			sourceTree = "<group>";
+		};
+		9DC34F774B88D628008B9918 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				229DEFDA8ACE048AEB2B478D /* HistoryView.swift */,
+			);
+			name = History;
+			path = History;
+			sourceTree = "<group>";
+		};
+		9F4C88E80D23B3A8980559D8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1B8EBC79B5A7B65BC240F823 /* ActivityType.swift */,
+				D8DE024067BCE60AA84EC631 /* DistanceUnit.swift */,
+				D72EA4CA7898DC4096CF621C /* PlannedRoute.swift */,
+				52B641F9EA4F2E58626AB303 /* WorkoutRecord.swift */,
+			);
+			name = Models;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AD3E9E897C21281649528F25 /* Walkou */ = {
+			isa = PBXGroup;
+			children = (
+				3BAE556A661AF2F75AE21B07 /* App */,
+				2EEEDCD83F577416A0B9FFD7 /* DesignSystem */,
+				87FCA622CD921320BC953320 /* Features */,
+				9F4C88E80D23B3A8980559D8 /* Models */,
+				35A268AE6F877AB8CDFBCC71 /* Resources */,
+				1EAC99DC209DF009D8D5FFDA /* Services */,
+				BB3134F81F2060C5E47FE60B /* Workout */,
+			);
+			name = Walkou;
+			path = Walkou;
+			sourceTree = "<group>";
+		};
+		AF1BD947488EF8A157D7262A /* WalkouTests */ = {
+			isa = PBXGroup;
+			children = (
+				F0414C0D393216322A53D10F /* RouteTrackerTests.swift */,
+			);
+			name = WalkouTests;
+			path = WalkouTests;
+			sourceTree = "<group>";
+		};
+		BB3134F81F2060C5E47FE60B /* Workout */ = {
+			isa = PBXGroup;
+			children = (
+				8AA293292DE41D043422085D /* Geo.swift */,
+				55D08B7A65FD8189D22E9E62 /* RouteTracker.swift */,
+				E137400756C5C80429E3E5A7 /* WorkoutSession.swift */,
+			);
+			name = Workout;
+			path = Workout;
+			sourceTree = "<group>";
+		};
+		F6EDE0DD1DC5F0C7C0066C88 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				F92C2989542FC8CA823CA9DA /* SettingsView.swift */,
+			);
+			name = Settings;
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		F8055AF888F853DC5C8DD949 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BCC040EC9B8BA8B2E510FB51 /* Walkou.app */,
+				BA1612B5B6ED8CB82F7C8A43 /* WalkouTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0B322CC0FE8EB36E4B0F2956 /* WalkouTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF3E1A837D35258F69C52290 /* Build configuration list for PBXNativeTarget "WalkouTests" */;
+			buildPhases = (
+				831312C1BA7145AF82C83977 /* Sources */,
+				0BE68906C1807008DA11DA5F /* Frameworks */,
+				632B320B8F1EC03E6C4FC065 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				72BFE219D481F655BE776082 /* PBXTargetDependency */,
+			);
+			name = WalkouTests;
+			productName = WalkouTests;
+			productReference = BA1612B5B6ED8CB82F7C8A43 /* WalkouTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		CF47210DF27374CF181963AD /* Walkou */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B043AB6CAD4997F1CEC7F112 /* Build configuration list for PBXNativeTarget "Walkou" */;
+			buildPhases = (
+				FC09C787FABA57274D83C349 /* Sources */,
+				A2C0CF0CC3FA90709DF3380A /* Frameworks */,
+				9C43BE83660B9E7DF188FC72 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Walkou;
+			productName = Walkou;
+			productReference = BCC040EC9B8BA8B2E510FB51 /* Walkou.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		12092FE61237552C8EFB05F6 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = CCB0D8D100154B7613E5EF6C /* Build configuration list for PBXProject "Walkou" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4D21FC64521CD9CBC09B5043;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = F8055AF888F853DC5C8DD949 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CF47210DF27374CF181963AD /* Walkou */,
+				0B322CC0FE8EB36E4B0F2956 /* WalkouTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		632B320B8F1EC03E6C4FC065 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C43BE83660B9E7DF188FC72 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EF2B0EDFC3D3CF1672CC907 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		831312C1BA7145AF82C83977 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2D9405D20E0CB52280E303B9 /* RouteTrackerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC09C787FABA57274D83C349 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EBD79880D664E66B8AAAAFD4 /* ActiveWorkoutView.swift in Sources */,
+				34802E6EFE1B8CF8F77ED90B /* ActivityType.swift in Sources */,
+				25CEEA5D0A4DFC69A1F96235 /* AppModel.swift in Sources */,
+				BA966265F579EF7AEE97530C /* CelebrationView.swift in Sources */,
+				7B26FEC15C1E7076B98E28A4 /* Components.swift in Sources */,
+				E460A07C098466F13DB9F0C2 /* DistanceUnit.swift in Sources */,
+				3BD246C39455E81EC21B7DC2 /* Geo.swift in Sources */,
+				F50E9BA8EAD1E320BA6A515C /* HealthKitService.swift in Sources */,
+				ABB8FC77CBF636CA8CA4B28A /* HistoryView.swift in Sources */,
+				EA416B3C979303F24066EE59 /* HomeView.swift in Sources */,
+				BF0B0D271D4D1FB166D2C364 /* LocationService.swift in Sources */,
+				E39ACA469B0D721FBB55447E /* NotificationService.swift in Sources */,
+				6C927ADF3518D3ED9E0B5206 /* OnboardingView.swift in Sources */,
+				293258BBE96C792B418C3438 /* PedometerService.swift in Sources */,
+				0229E3240B2F44CA7B7397CB /* PlannedRoute.swift in Sources */,
+				111678FB7C99F80BA970CF05 /* PlanView.swift in Sources */,
+				F97438D4C21DEE98303C1CBC /* RoutePlanner.swift in Sources */,
+				3697A6DA3094D8A3B0D694B4 /* RouteSuggestionsView.swift in Sources */,
+				887B48919EC7797F748881ED /* RouteTracker.swift in Sources */,
+				0A23D165DBC2F2ACA97BEC86 /* SettingsView.swift in Sources */,
+				3AE7E2A5CDFBA9947D17F6AE /* Theme.swift in Sources */,
+				99981E0BA201572AE456EDC7 /* VoiceCoach.swift in Sources */,
+				0FA40EDB61123170657791AC /* WalkouApp.swift in Sources */,
+				315F298465A730B97760426F /* WorkoutFlowView.swift in Sources */,
+				0E3B421F2A94DB5373338F93 /* WorkoutRecord.swift in Sources */,
+				4FDAFD9A0F91067F3B4539BD /* WorkoutSession.swift in Sources */,
+				031A598E1A670AE4B92FBB7D /* WorkoutSummaryView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		72BFE219D481F655BE776082 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Walkou;
+			target = CF47210DF27374CF181963AD /* Walkou */;
+			targetProxy = 927722A978095F4DED7ED719 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2B887851D870323B57E447FB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		2C4068CA9A1132877C3F841B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Walkou/Resources/Walkou.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Walkou/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.walkou.app;
+				PRODUCT_NAME = Walkou;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		2E7A902C0F7C04B5D59CA43D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = Walkou/Resources/Walkou.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Walkou/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.walkou.app;
+				PRODUCT_NAME = Walkou;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		960BA8DBED8A566B11216F21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		9E83C036DBC5C075C94843D6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.walkou.app.tests;
+				PRODUCT_NAME = WalkouTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Walkou.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Walkou";
+			};
+			name = Debug;
+		};
+		F8D94EE1F01C30D4DBB065B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.walkou.app.tests;
+				PRODUCT_NAME = WalkouTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Walkou.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Walkou";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B043AB6CAD4997F1CEC7F112 /* Build configuration list for PBXNativeTarget "Walkou" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2C4068CA9A1132877C3F841B /* Debug */,
+				2E7A902C0F7C04B5D59CA43D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF3E1A837D35258F69C52290 /* Build configuration list for PBXNativeTarget "WalkouTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E83C036DBC5C075C94843D6 /* Debug */,
+				F8D94EE1F01C30D4DBB065B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CCB0D8D100154B7613E5EF6C /* Build configuration list for PBXProject "Walkou" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B887851D870323B57E447FB /* Debug */,
+				960BA8DBED8A566B11216F21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 12092FE61237552C8EFB05F6 /* Project object */;
+}
