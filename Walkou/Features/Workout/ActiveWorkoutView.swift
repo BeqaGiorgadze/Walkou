@@ -76,6 +76,11 @@ struct ActiveWorkoutView: View {
             Text(session.goalReached ? "Goal reached. Nice work!" : "\(Format.steps(session.remainingSteps)) steps left to your goal.")
         }
         .persistentSystemOverlays(.hidden)
+        .onChange(of: session.currentLocation?.timestamp) { _, _ in
+            // Follow the autopilot, since "follow user location" tracks the real GPS.
+            guard session.isSimulated, let here = session.currentLocation?.coordinate else { return }
+            camera = .camera(MapCamera(centerCoordinate: here, distance: 900, heading: 0, pitch: 0))
+        }
     }
 
     // MARK: - Top
@@ -83,6 +88,15 @@ struct ActiveWorkoutView: View {
     @ViewBuilder
     private var topArea: some View {
         VStack(spacing: 10) {
+            if session.isSimulated, let speed = session.simulation?.speedMultiplier {
+                Text("SIMULATED WALK · \(Int(speed))×\(session.simulation?.noisyGPS == true ? " · NIGHT GPS" : "")")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(Theme.navBackground)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color(hex: 0xFFD25A), in: Capsule())
+            }
             if let navigation = session.navigation, navigation.isOffRoute {
                 OffRouteBanner(distance: navigation.distanceFromRoute, unit: session.unit, hasDetour: session.detour != nil)
             } else if session.routeFinished {
@@ -311,7 +325,21 @@ private struct WorkoutMap: View {
                 }
             }
 
-            UserAnnotation()
+            if session.isSimulated {
+                // The real location doesn't move during a simulated walk; draw the autopilot instead.
+                if let here = session.currentLocation?.coordinate {
+                    Annotation("", coordinate: here, anchor: .center) {
+                        Circle()
+                            .fill(Theme.mint)
+                            .frame(width: 20, height: 20)
+                            .overlay(Circle().strokeBorder(.white, lineWidth: 3))
+                            .background(Circle().fill(Theme.mint.opacity(0.25)).frame(width: 44, height: 44))
+                    }
+                    .annotationTitles(.hidden)
+                }
+            } else {
+                UserAnnotation()
+            }
         }
         .mapStyle(.standard(elevation: .flat, emphasis: .muted, pointsOfInterest: .excludingAll))
     }

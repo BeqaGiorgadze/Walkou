@@ -36,6 +36,18 @@ You need a Mac with **Xcode 16 or newer**.
 The simulator has no step counter. On it, steps are estimated from GPS distance, and you can fake movement with *Features → Location → City Walk / City Run*.
 For the real experience (step counting, GPS, background tracking, voice in your pocket), use an iPhone.
 
+### Testing gems without walking (autopilot)
+
+Builds run from Xcode have a **Developer** section in **Settings**:
+
+1. Turn on **Simulate walking** and pick a speed (1×, 5×, 10× or 20×).
+2. Optional: turn on **Night GPS (noisy)** to add GPS jitter and weak fixes, like a night walk between buildings.
+3. Start a workout as usual. The app walks by itself:
+   - **Route:** follows the route, with short detours to grab bonus gems.
+   - **Free walk:** heads to the nearest gem, then back to the gold gem at your start after halfway.
+
+A yellow "SIMULATED WALK" badge shows while it runs. In the Simulator, set a start location first: *Features → Location → Custom Location…* (Tbilisi: 41.7151, 44.8271). The autopilot also works on a real iPhone at your desk.
+
 ## Apple Developer account
 
 | | Free Apple ID | Apple Developer Program |

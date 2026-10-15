@@ -6,6 +6,10 @@ struct SettingsView: View {
     @AppStorage(SettingsKey.offRouteAlerts) private var offRouteAlerts = true
     @AppStorage(SettingsKey.saveToHealth) private var saveToHealth = false
 
+    @AppStorage(SettingsKey.simulateWalk) private var simulateWalk = false
+    @AppStorage(SettingsKey.simulateSpeed) private var simulateSpeed = 5.0
+    @AppStorage(SettingsKey.simulateNoisyGPS) private var simulateNoisyGPS = false
+
     @State private var healthError: String?
     @State private var isRequestingHealth = false
 
@@ -68,6 +72,30 @@ struct SettingsView: View {
                 } footer: {
                     Text("Route lengths are planned from these average strides. Your real steps are counted by your iPhone's motion sensors.")
                 }
+
+                #if DEBUG
+                Section {
+                    Toggle(isOn: $simulateWalk) {
+                        Label("Simulate walking", systemImage: "figure.walk.motion")
+                    }
+                    if simulateWalk {
+                        Picker("Speed", selection: $simulateSpeed) {
+                            Text("1×").tag(1.0)
+                            Text("5×").tag(5.0)
+                            Text("10×").tag(10.0)
+                            Text("20×").tag(20.0)
+                        }
+                        .pickerStyle(.segmented)
+                        Toggle(isOn: $simulateNoisyGPS) {
+                            Label("Night GPS (noisy)", systemImage: "moon.stars.fill")
+                        }
+                    }
+                } header: {
+                    Text("Developer")
+                } footer: {
+                    Text("Only in builds run from Xcode. Workouts walk by themselves: along the route (with bonus-gem detours) or toward gems in free walk. Night GPS adds jitter and weak fixes.")
+                }
+                #endif
 
                 Section("About") {
                     LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")

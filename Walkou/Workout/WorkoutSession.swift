@@ -56,6 +56,9 @@ final class WorkoutSession: Identifiable {
 
     private(set) var voiceEnabled: Bool
     let offRouteAlertsEnabled: Bool
+    /// Test autopilot settings; nil for a real walk.
+    let simulation: SimulatedWalker.Settings?
+    var isSimulated: Bool { simulation != nil }
 
     // Dependencies and bookkeeping
     private let location: LocationService
@@ -72,6 +75,8 @@ final class WorkoutSession: Identifiable {
     @ObservationIgnored private var lastRecorded: CLLocation?
     @ObservationIgnored private var lastDetourRequest: Date?
     @ObservationIgnored private var countdownTask: Task<Void, Never>?
+    @ObservationIgnored private var walker: SimulatedWalker?
+    @ObservationIgnored private var simulationTask: Task<Void, Never>?
     @ObservationIgnored private var lastSplitProgress: Double = -100
     @ObservationIgnored private var lastGemSpawnDistance: Double = -250
     @ObservationIgnored private var isSpawningGem = false
@@ -83,7 +88,8 @@ final class WorkoutSession: Identifiable {
         location: LocationService,
         unit: DistanceUnit,
         voiceEnabled: Bool,
-        offRouteAlertsEnabled: Bool
+        offRouteAlertsEnabled: Bool,
+        simulation: SimulatedWalker.Settings? = nil
     ) {
         self.plan = plan
         self.plannedRoute = route
@@ -91,6 +97,7 @@ final class WorkoutSession: Identifiable {
         self.unit = unit
         self.voiceEnabled = voiceEnabled
         self.offRouteAlertsEnabled = offRouteAlertsEnabled
+        self.simulation = simulation
         voice.isEnabled = voiceEnabled
         if let route {
             setGuidedRoute(route)
@@ -146,10 +153,14 @@ final class WorkoutSession: Identifiable {
 
     func start() {
         guard case .countdown = phase, countdownTask == nil else { return }
-        location.onWorkoutLocations = { [weak self] locations in
-            self?.ingest(locations)
+        if let simulation {
+            startSimulation(simulation)
+        } else {
+            location.onWorkoutLocations = { [weak self] locations in
+                self?.ingest(locations)
+            }
+            location.startWorkoutTracking()
         }
-        location.startWorkoutTracking()
 
         countdownTask = Task { [weak self] in
             for value in stride(from: 3, through: 1, by: -1) {
@@ -192,7 +203,9 @@ final class WorkoutSession: Identifiable {
         if startDate == nil { startDate = Date() }
         endDate = Date()
         pedometer.stopUpdates()
-        location.stopWorkoutTracking()
+        simulationTask?.cancel()
+        simulationTask = nil
+        if simulation == nil { location.stopWorkoutTracking() }
         voice.stop()
         phase = .finished
     }
@@ -432,6 +445,27 @@ final class WorkoutSession: Identifiable {
                 voice.say(isWayBack
                     ? "You're back at your start. Just \(more) more steps to reach your goal!"
                     : "Route complete. Just \(more) more steps to reach your goal. Keep moving!")
+            }
+        }
+    }
+
+    // MARK: - Test autopilot
+
+    private func startSimulation(_ settings: SimulatedWalker.Settings) {
+        let start = plannedRoute?.start
+            ?? location.lastLocation?.coordinate
+            ?? CLLocationCoordinate2D(latitude: 41.7151, longitude: 44.8271) // Tbilisi
+        walker = SimulatedWalker(start: start, settings: settings)
+        simulationTask = Task { [weak self] in
+            let interval = 0.5
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(interval))
+                guard let self, var walker = self.walker else { return }
+                // Stand still during the countdown and while paused.
+                let moving = self.phase == .active
+                let fix = walker.advance(seconds: moving ? interval : 0, route: self.guidedRoute, gems: self.gems)
+                self.walker = walker
+                self.ingest([fix])
             }
         }
     }

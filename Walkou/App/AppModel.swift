@@ -11,6 +11,10 @@ enum SettingsKey {
     static let goalSteps = "goalSteps"
     static let activity = "activity"
     static let mode = "mode"
+    // Developer (debug builds only)
+    static let simulateWalk = "debug.simulateWalk"
+    static let simulateSpeed = "debug.simulateSpeed"
+    static let simulateNoisyGPS = "debug.simulateNoisyGPS"
 }
 
 enum AppTab: Hashable {
@@ -37,8 +41,22 @@ final class AppModel {
             location: location,
             unit: unit,
             voiceEnabled: defaults.object(forKey: SettingsKey.voiceGuidance) as? Bool ?? true,
-            offRouteAlertsEnabled: defaults.object(forKey: SettingsKey.offRouteAlerts) as? Bool ?? true
+            offRouteAlertsEnabled: defaults.object(forKey: SettingsKey.offRouteAlerts) as? Bool ?? true,
+            simulation: simulationSettings(defaults)
         )
         activeSession = session
+    }
+
+    private func simulationSettings(_ defaults: UserDefaults) -> SimulatedWalker.Settings? {
+        #if DEBUG
+        guard defaults.bool(forKey: SettingsKey.simulateWalk) else { return nil }
+        let speed = defaults.double(forKey: SettingsKey.simulateSpeed)
+        return SimulatedWalker.Settings(
+            speedMultiplier: speed > 0 ? speed : 5,
+            noisyGPS: defaults.bool(forKey: SettingsKey.simulateNoisyGPS)
+        )
+        #else
+        return nil
+        #endif
     }
 }
