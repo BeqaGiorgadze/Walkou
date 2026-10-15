@@ -10,6 +10,7 @@ struct WalkouApp: App {
             RootView()
                 .environment(model)
                 .tint(Theme.indigo)
+                .task { await AppWarmUp.run() }
         }
         .modelContainer(for: WorkoutRecord.self)
     }

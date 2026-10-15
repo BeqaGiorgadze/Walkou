@@ -63,7 +63,7 @@ final class WorkoutSession: Identifiable {
     // Dependencies and bookkeeping
     private let location: LocationService
     private let pedometer = PedometerService()
-    private let voice = VoiceCoach()
+    private let voice = VoiceCoach.shared
     private let planner = RoutePlanner()
     @ObservationIgnored private var tracker: RouteTracker?
     @ObservationIgnored private var announcedInstructions = Set<Int>()

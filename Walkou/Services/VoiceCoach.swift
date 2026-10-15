@@ -3,13 +3,21 @@ import AVFoundation
 
 /// Spoken guidance. Ducks other audio (music, podcasts) while talking, also when the screen is locked.
 final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate {
+    /// One coach for the whole app. Creating the speech engine and loading a voice is slow the first
+    /// time (it can block the screen for a second), so it's made once and warmed up at launch.
+    static let shared = VoiceCoach()
+
+    /// Loading the voice reads it from disk; `static let` makes this happen once, on whichever
+    /// thread touches it first (the launch warm-up does it in the background).
+    static let englishVoice = AVSpeechSynthesisVoice(language: "en-US")
+
     var isEnabled = true
 
     private let synthesizer = AVSpeechSynthesizer()
     /// One hold on the audio session for as long as anything is being spoken.
     private var holdingSession = false
 
-    override init() {
+    private override init() {
         super.init()
         synthesizer.delegate = self
     }
@@ -25,7 +33,7 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate {
         }
 
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
+        utterance.voice = Self.englishVoice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 1.02
         synthesizer.speak(utterance)
     }

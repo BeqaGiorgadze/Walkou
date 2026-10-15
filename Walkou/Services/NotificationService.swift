@@ -65,6 +65,13 @@ enum Haptics {
         return generator
     }()
 
+    /// Creates the generators ahead of time (used by the launch warm-up).
+    static func prepare() {
+        impact.prepare()
+        heavy.prepare()
+        notification.prepare()
+    }
+
     static func tap() {
         impact.impactOccurred()
         impact.prepare()

@@ -23,15 +23,23 @@ enum SoundEffects {
 
     private static var players: [Effect: AVAudioPlayer] = [:]
 
+    /// Loads all chimes so the first gem doesn't stall while a file is decoded.
+    static func preload() {
+        for effect in [Effect.gemCommon, .gemBonus, .gemRare, .gemLegendary, .levelUp] { _ = player(for: effect) }
+    }
+
+    private static func player(for effect: Effect) -> AVAudioPlayer? {
+        if let player = players[effect] { return player }
+        guard let url = Bundle.main.url(forResource: effect.rawValue, withExtension: "wav"),
+              let player = try? AVAudioPlayer(contentsOf: url) else { return nil }
+        player.volume = 0.8
+        player.prepareToPlay()
+        players[effect] = player
+        return player
+    }
+
     static func play(_ effect: Effect) {
-        if players[effect] == nil,
-           let url = Bundle.main.url(forResource: effect.rawValue, withExtension: "wav"),
-           let player = try? AVAudioPlayer(contentsOf: url) {
-            player.volume = 0.8
-            player.prepareToPlay()
-            players[effect] = player
-        }
-        guard let player = players[effect] else { return }
+        guard let player = player(for: effect) else { return }
         AudioSessionController.shared.hold()
         player.currentTime = 0
         player.play()
