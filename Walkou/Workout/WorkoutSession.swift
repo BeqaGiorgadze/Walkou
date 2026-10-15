@@ -456,14 +456,20 @@ final class WorkoutSession: Identifiable {
             ?? location.lastLocation?.coordinate
             ?? CLLocationCoordinate2D(latitude: 41.7151, longitude: 44.8271) // Tbilisi
         walker = SimulatedWalker(start: start, settings: settings)
+        // One fix so the map shows the start during the countdown; then nothing until the walk begins.
+        if var walker {
+            let fix = walker.advance(seconds: 0, route: guidedRoute, gems: gems)
+            self.walker = walker
+            ingest([fix])
+        }
         simulationTask = Task { [weak self] in
             let interval = 0.5
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(interval))
                 guard let self, var walker = self.walker else { return }
-                // Stand still during the countdown and while paused.
-                let moving = self.phase == .active
-                let fix = walker.advance(seconds: moving ? interval : 0, route: self.guidedRoute, gems: self.gems)
+                // Only move (and report) while the walk is running, not during the countdown or a pause.
+                guard self.phase == .active else { continue }
+                let fix = walker.advance(seconds: interval, route: self.guidedRoute, gems: self.gems)
                 self.walker = walker
                 self.ingest([fix])
             }

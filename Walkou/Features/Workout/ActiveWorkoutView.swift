@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 /// The live screen: dark navigation map, next turn, steps toward the goal and controls.
 struct ActiveWorkoutView: View {
@@ -8,6 +9,8 @@ struct ActiveWorkoutView: View {
     @Environment(AppModel.self) private var model
     @State private var camera: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
     @State private var showEndDialog = false
+    /// Last position the camera was moved to while following the autopilot.
+    @State private var followedCenter: CLLocationCoordinate2D?
 
     var body: some View {
         ZStack {
@@ -64,7 +67,7 @@ struct ActiveWorkoutView: View {
         }
         .environment(\.colorScheme, .dark)
         .animation(.spring(duration: 0.4), value: session.showCelebration)
-        .animation(.easeInOut, value: session.phase)
+        .animation(.easeInOut, value: isCountingDown)
         .confirmationDialog("End workout?", isPresented: $showEndDialog, titleVisibility: .visible) {
             Button("Finish & save") { session.finish() }
             Button("Discard", role: .destructive) {
@@ -78,9 +81,18 @@ struct ActiveWorkoutView: View {
         .persistentSystemOverlays(.hidden)
         .onChange(of: session.currentLocation?.timestamp) { _, _ in
             // Follow the autopilot, since "follow user location" tracks the real GPS.
-            guard session.isSimulated, let here = session.currentLocation?.coordinate else { return }
+            // Only move the camera after real movement, never during the countdown,
+            // so the map isn't asked to re-position on every update.
+            guard session.isSimulated, !isCountingDown, let here = session.currentLocation?.coordinate else { return }
+            if let followedCenter, Geo.distance(followedCenter, here) < 4 { return }
+            followedCenter = here
             camera = .camera(MapCamera(centerCoordinate: here, distance: 900, heading: 0, pitch: 0))
         }
+    }
+
+    private var isCountingDown: Bool {
+        if case .countdown = session.phase { return true }
+        return false
     }
 
     // MARK: - Top
