@@ -101,7 +101,8 @@ struct ActiveWorkoutView: View {
             if !session.gems.isEmpty {
                 HStack {
                     Spacer()
-                    GemCounterPill(collected: session.collectedGemCount, total: session.gems.count, points: session.gemPoints)
+                    GemCounterPill(collected: session.collectedGemCount, total: session.gems.count, points: session.gemPoints,
+                                   nearestDistance: session.nearestGemDistance, unit: session.unit)
                 }
             }
 
@@ -282,8 +283,8 @@ private struct WorkoutMap: View {
                         RoutePin(symbol: "flag.checkered", color: Theme.mintDeep)
                     }
                 }
-            } else if session.track.count > 1 {
-                MapPolyline(coordinates: session.track.map(\.coordinate))
+            } else if session.mapTrack.count > 1 {
+                MapPolyline(coordinates: session.mapTrack)
                     .stroke(Theme.mint, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
             }
 

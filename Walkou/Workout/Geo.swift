@@ -35,6 +35,31 @@ enum Geo {
         return (atan2(y, x).degrees + 360).truncatingRemainder(dividingBy: 360)
     }
 
+    /// Douglas–Peucker simplification: drops points that deviate less than `tolerance` meters
+    /// from the line. Street routes often have thousands of nearly collinear points.
+    static func simplify(_ coordinates: [CLLocationCoordinate2D], tolerance: Double = 3) -> [CLLocationCoordinate2D] {
+        guard coordinates.count > 2 else { return coordinates }
+        var keep = [Bool](repeating: false, count: coordinates.count)
+        keep[0] = true
+        keep[coordinates.count - 1] = true
+        var stack = [(0, coordinates.count - 1)]
+        while let (first, last) = stack.popLast() {
+            guard last - first > 1 else { continue }
+            var maxDistance = 0.0
+            var index = first
+            for i in (first + 1)..<last {
+                let d = project(coordinates[i], ontoSegment: coordinates[first], coordinates[last]).distance
+                if d > maxDistance { maxDistance = d; index = i }
+            }
+            if maxDistance > tolerance {
+                keep[index] = true
+                stack.append((first, index))
+                stack.append((index, last))
+            }
+        }
+        return coordinates.indices.filter { keep[$0] }.map { coordinates[$0] }
+    }
+
     /// Cumulative distance at every vertex of a polyline (first element is 0).
     static func cumulativeDistances(_ coordinates: [CLLocationCoordinate2D]) -> [Double] {
         guard !coordinates.isEmpty else { return [] }

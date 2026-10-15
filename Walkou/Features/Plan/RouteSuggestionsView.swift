@@ -15,6 +15,8 @@ struct RouteSuggestionsView: View {
     @State private var errorMessage: String?
     @State private var camera: MapCameraPosition = .userLocation(fallback: .automatic)
     @State private var placingBonusFor: Set<UUID> = []
+    @State private var arrows: [UUID: [Arrow]] = [:]
+    @State private var selectionTask: Task<Void, Never>?
 
     private var selectedRoute: PlannedRoute? {
         routes.first { $0.id == selectedID } ?? routes.first
@@ -42,9 +44,16 @@ struct RouteSuggestionsView: View {
                 if routes.isEmpty { await load() }
             }
             .onChange(of: selectedID) { _, _ in
-                frameSelectedRoute(animated: true)
-                placeBonusGemsIfNeeded()
+                // Swiping the cards changes the selection many times; act once it settles.
+                selectionTask?.cancel()
+                selectionTask = Task {
+                    try? await Task.sleep(for: .milliseconds(250))
+                    guard !Task.isCancelled else { return }
+                    frameSelectedRoute(animated: true)
+                    placeBonusGemsIfNeeded()
+                }
             }
+            .onDisappear { selectionTask?.cancel() }
     }
 
     // MARK: - Map
@@ -71,7 +80,7 @@ struct RouteSuggestionsView: View {
                 MapPolyline(coordinates: route.coordinates)
                     .stroke(route.color, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
 
-                ForEach(directionArrows(for: route)) { arrow in
+                ForEach(arrows[route.id] ?? []) { arrow in
                     Annotation("", coordinate: arrow.coordinate, anchor: .center) {
                         Image(systemName: "chevron.up")
                             .font(.system(size: 9, weight: .black))
@@ -236,12 +245,17 @@ struct RouteSuggestionsView: View {
         }
 
         do {
-            let found = try await RoutePlanner().suggestions(from: origin, plan: plan).map { route in
-                var route = route
-                route.gems = GemPlanner.routeGems(for: route)
-                return route
-            }
+            // Planning and gem placement run off the main thread so the screen never stalls.
+            let plan = self.plan
+            let found = try await Task.detached(priority: .userInitiated) {
+                try await RoutePlanner().suggestions(from: origin, plan: plan).map { route in
+                    var route = route
+                    route.gems = GemPlanner.routeGems(for: route)
+                    return route
+                }
+            }.value
             placingBonusFor = []
+            arrows = Dictionary(uniqueKeysWithValues: found.map { ($0.id, Self.directionArrows(for: $0)) })
             routes = found
             selectedID = found.first?.id
             // Let the map lay out with its new content before moving the camera, otherwise the
@@ -259,7 +273,9 @@ struct RouteSuggestionsView: View {
         placingBonusFor.insert(route.id)
         let stride = plan.activity.strideLength
         Task {
-            let bonus = await GemPlanner.bonusGems(for: route, strideLength: stride)
+            let bonus = await Task.detached(priority: .utility) {
+                await GemPlanner.bonusGems(for: route, strideLength: stride)
+            }.value
             if let index = routes.firstIndex(where: { $0.id == route.id }) {
                 withAnimation(.snappy) {
                     routes[index].gems.append(contentsOf: bonus)
@@ -290,14 +306,14 @@ struct RouteSuggestionsView: View {
         }
     }
 
-    private struct Arrow: Identifiable {
+    struct Arrow: Identifiable {
         let id: Int
         let coordinate: CLLocationCoordinate2D
         let bearing: Double
     }
 
     /// Small arrows along the route showing which way it goes.
-    private func directionArrows(for route: PlannedRoute) -> [Arrow] {
+    private static func directionArrows(for route: PlannedRoute) -> [Arrow] {
         let tracker = RouteTracker(route: route)
         let total = tracker.totalDistance
         guard total > 200 else { return [] }

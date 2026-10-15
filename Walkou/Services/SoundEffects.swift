@@ -1,7 +1,7 @@
 import Foundation
 import AVFoundation
 
-/// Short chimes for collecting gems and levelling up. Mixes with music instead of stopping it.
+/// Short chimes for collecting gems and levelling up. Music is ducked briefly, never stopped.
 @MainActor
 enum SoundEffects {
     enum Effect: String {
@@ -24,12 +24,6 @@ enum SoundEffects {
     private static var players: [Effect: AVAudioPlayer] = [:]
 
     static func play(_ effect: Effect) {
-        let session = AVAudioSession.sharedInstance()
-        if session.category != .playback {
-            try? session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-        }
-        try? session.setActive(true)
-
         if players[effect] == nil,
            let url = Bundle.main.url(forResource: effect.rawValue, withExtension: "wav"),
            let player = try? AVAudioPlayer(contentsOf: url) {
@@ -38,7 +32,9 @@ enum SoundEffects {
             players[effect] = player
         }
         guard let player = players[effect] else { return }
+        AudioSessionController.shared.hold()
         player.currentTime = 0
         player.play()
+        AudioSessionController.shared.release(after: player.duration + 0.2)
     }
 }

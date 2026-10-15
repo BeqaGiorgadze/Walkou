@@ -145,14 +145,15 @@ struct RoutePlanner {
         var offset = 0.0
 
         for (legIndex, leg) in legs.enumerated() {
-            var legCoordinates = leg.coordinates
+            let simplified = Geo.simplify(leg.coordinates)
+            var legCoordinates = simplified
             if !coordinates.isEmpty, !legCoordinates.isEmpty {
                 legCoordinates.removeFirst() // shared with the previous leg's last point
             }
             coordinates.append(contentsOf: legCoordinates)
 
             // The service's step distances and our polyline geometry differ slightly; scale to match.
-            let geometryLength = Geo.length(leg.coordinates)
+            let geometryLength = Geo.length(simplified)
             let scale = leg.distance > 0 ? geometryLength / leg.distance : 1
             let isLastLeg = legIndex == legs.count - 1
             var stepStart = 0.0

@@ -68,4 +68,14 @@ final class GemTests: XCTestCase {
         XCTAssertEqual(Geo.bearing(from: a, to: Geo.destination(from: a, bearing: 90, meters: 500)), 90, accuracy: 0.5)
         XCTAssertEqual(Geo.bearing(from: a, to: Geo.destination(from: a, bearing: 225, meters: 500)), 225, accuracy: 0.5)
     }
+
+    func testSimplifyKeepsCornersAndDropsStraightPoints() {
+        let a = CLLocationCoordinate2D(latitude: 41.7, longitude: 44.8)
+        var line = stride(from: 0.0, through: 500, by: 5).map { Geo.destination(from: a, bearing: 0, meters: $0) }
+        let corner = line.last!
+        line += stride(from: 5.0, through: 300, by: 5).map { Geo.destination(from: corner, bearing: 90, meters: $0) }
+        let simple = Geo.simplify(line)
+        XCTAssertEqual(simple.count, 3)
+        XCTAssertEqual(Geo.length(simple), Geo.length(line), accuracy: 1)
+    }
 }

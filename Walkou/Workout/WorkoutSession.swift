@@ -24,6 +24,8 @@ final class WorkoutSession: Identifiable {
     private(set) var distance: Double = 0
     private(set) var elevationGain: Double = 0
     private(set) var track: [CLLocation] = []
+    /// Thinned copy of the track for drawing on the map (a point every ~8 m).
+    private(set) var mapTrack: [CLLocationCoordinate2D] = []
     private(set) var startDate: Date?
     private(set) var endDate: Date?
     private(set) var startCoordinate: CLLocationCoordinate2D?
@@ -70,6 +72,7 @@ final class WorkoutSession: Identifiable {
     @ObservationIgnored private var lastRecorded: CLLocation?
     @ObservationIgnored private var lastDetourRequest: Date?
     @ObservationIgnored private var countdownTask: Task<Void, Never>?
+    @ObservationIgnored private var lastSplitProgress: Double = -100
     @ObservationIgnored private var lastGemSpawnDistance: Double = -250
     @ObservationIgnored private var isSpawningGem = false
     @ObservationIgnored private var nextFreeGemID = GemPlanner.freeIDBase
@@ -112,6 +115,12 @@ final class WorkoutSession: Identifiable {
     var calories: Double { distance / 1000 * plan.activity.kilocaloriesPerKilometer }
 
     var gemPoints: Int { gemTally.points }
+
+    /// Meters to the closest gem not yet collected (for the "45 m" hint).
+    var nearestGemDistance: Double? {
+        guard let here = currentLocation?.coordinate else { return nil }
+        return gems.filter { !$0.isCollected }.map { Geo.distance(here, $0.coordinate) }.min()
+    }
 
     var collectedGemCount: Int { gems.filter(\.isCollected).count }
 
@@ -270,11 +279,18 @@ final class WorkoutSession: Identifiable {
         walkedPath = []
         remainingPath = route.coordinates
         navigation = nil
+        lastSplitProgress = -100
     }
 
     private func ingest(_ locations: [CLLocation]) {
         for location in locations {
-            guard location.horizontalAccuracy >= 0, location.horizontalAccuracy <= 35 else { continue }
+            guard location.horizontalAccuracy >= 0 else { continue }
+            // Weak fixes (night, narrow streets) are too rough for distance and navigation,
+            // but still good enough to pick up a gem you're standing next to.
+            guard location.horizontalAccuracy <= 35 else {
+                if location.horizontalAccuracy <= 65 { checkGems(at: location) }
+                continue
+            }
             if startCoordinate == nil { startCoordinate = location.coordinate }
 
             if phase == .active {
@@ -297,6 +313,11 @@ final class WorkoutSession: Identifiable {
         }
         lastRecorded = location
         track.append(location)
+        if let lastMapPoint = mapTrack.last {
+            if Geo.distance(lastMapPoint, location.coordinate) >= 8 { mapTrack.append(location.coordinate) }
+        } else {
+            mapTrack.append(location.coordinate)
+        }
 
         if location.verticalAccuracy > 0, location.verticalAccuracy <= 10 {
             if let lastAltitude {
@@ -363,9 +384,14 @@ final class WorkoutSession: Identifiable {
         let snapshot = tracker.update(with: location.coordinate)
         self.tracker = tracker
         navigation = snapshot
-        let parts = tracker.split()
-        walkedPath = parts.walked
-        remainingPath = parts.remaining
+        // Redrawing the route lines is the most expensive thing on screen; only do it when
+        // progress moved noticeably instead of on every GPS fix.
+        if abs(tracker.progress - lastSplitProgress) >= 8 || walkedPath.isEmpty {
+            lastSplitProgress = tracker.progress
+            let parts = tracker.split()
+            walkedPath = parts.walked
+            remainingPath = parts.remaining
+        }
 
         guard phase == .active else { return }
 
@@ -425,16 +451,30 @@ final class WorkoutSession: Identifiable {
         guard phase == .active, !gems.isEmpty else { return }
         // Gems only count on foot: ignore fixes faster than 25 km/h.
         if location.speed > 7 { return }
-        let radius = 25 + min(15, max(0, location.horizontalAccuracy - 10))
-        let progress = tracker.map(\.progress)
+        // Generous radius: 35 m, growing up to 55 m when GPS is weak.
+        let radius = 35 + min(20, max(0, location.horizontalAccuracy - 10))
+        let followingPlannedRoute = plannedRoute != nil && guidedRoute?.id == plannedRoute?.id
+        let progress = followingPlannedRoute ? tracker?.progress : nil
+        let onRoute = !(navigation?.isOffRoute ?? false)
         for index in gems.indices where !gems[index].isCollected {
             let gem = gems[index]
-            guard Geo.distance(location.coordinate, gem.coordinate) <= radius else { continue }
-            // On-route gems are reached in order, so a loop's finish gem isn't grabbed at the start.
-            if let along = gem.distanceIntoRoute, plannedRoute != nil, guidedRoute?.id == plannedRoute?.id {
-                guard let progress, progress >= along - 40 else { continue }
+            let distance = Geo.distance(location.coordinate, gem.coordinate)
+
+            if let along = gem.distanceIntoRoute, let progress {
+                // Walking past a gem on the route always counts, even if GPS drifted to the side.
+                if onRoute, progress >= along, distance <= 90 {
+                    collect(at: index)
+                    continue
+                }
+                // Gems near the start (like a loop's finish gem) only count once you've
+                // actually walked that far, so they aren't grabbed when you set off.
+                if let start = plannedRoute?.start, Geo.distance(start, gem.coordinate) < 80, progress < along - 60 {
+                    continue
+                }
             }
-            collect(at: index)
+            if distance <= radius {
+                collect(at: index)
+            }
         }
     }
 

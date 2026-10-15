@@ -6,6 +6,8 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate {
     var isEnabled = true
 
     private let synthesizer = AVSpeechSynthesizer()
+    /// One hold on the audio session for as long as anything is being spoken.
+    private var holdingSession = false
 
     override init() {
         super.init()
@@ -17,9 +19,10 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate {
         if interrupt, synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .word)
         }
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .voicePrompt, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
-        try? session.setActive(true)
+        if !holdingSession {
+            holdingSession = true
+            AudioSessionController.shared.hold()
+        }
 
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
@@ -29,14 +32,22 @@ final class VoiceCoach: NSObject, AVSpeechSynthesizerDelegate {
 
     func stop() {
         synthesizer.stopSpeaking(at: .immediate)
-        deactivateSession()
+        releaseIfIdle()
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        if !synthesizer.isSpeaking { deactivateSession() }
+        releaseIfIdle()
     }
 
-    private func deactivateSession() {
-        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        releaseIfIdle()
+    }
+
+    private func releaseIfIdle() {
+        DispatchQueue.main.async { [self] in
+            guard holdingSession, !synthesizer.isSpeaking else { return }
+            holdingSession = false
+            AudioSessionController.shared.release()
+        }
     }
 }

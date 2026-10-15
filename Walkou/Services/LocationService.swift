@@ -8,7 +8,6 @@ import Observation
 final class LocationService: NSObject, CLLocationManagerDelegate {
     private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
     private(set) var lastLocation: CLLocation?
-    private(set) var heading: CLLocationDirection?
 
     /// Receives every location fix while a workout is recording.
     @ObservationIgnored var onWorkoutLocations: (([CLLocation]) -> Void)?
@@ -61,9 +60,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         manager.showsBackgroundLocationIndicator = true
         backgroundSession = CLBackgroundActivitySession()
         manager.startUpdatingLocation()
-        if CLLocationManager.headingAvailable() {
-            manager.startUpdatingHeading()
-        }
     }
 
     func stopWorkoutTracking() {
@@ -73,7 +69,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         backgroundSession = nil
         manager.allowsBackgroundLocationUpdates = false
         manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        manager.stopUpdatingHeading()
         manager.stopUpdatingLocation()
     }
 
@@ -93,13 +88,6 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
         MainActor.assumeIsolated {
             if let last = locations.last { self.lastLocation = last }
             self.onWorkoutLocations?(locations)
-        }
-    }
-
-    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-        let value = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
-        MainActor.assumeIsolated {
-            self.heading = value
         }
     }
 

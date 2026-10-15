@@ -54,6 +54,8 @@ struct GemCounterPill: View {
     let collected: Int
     let total: Int
     let points: Int
+    var nearestDistance: Double? = nil
+    var unit: DistanceUnit = .kilometers
 
     var body: some View {
         HStack(spacing: 6) {
@@ -67,6 +69,19 @@ struct GemCounterPill: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color(hex: 0xFFD25A))
                 .contentTransition(.numericText(value: Double(points)))
+            if let nearestDistance, nearestDistance < 200 {
+                // Hint when a gem is close, so you know where to look.
+                HStack(spacing: 3) {
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 10, weight: .bold))
+                    Text(Format.shortDistance(nearestDistance, unit: unit))
+                        .font(.number(13, weight: .bold))
+                }
+                .foregroundStyle(Theme.gemInk)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Theme.mint, in: Capsule())
+            }
         }
         .padding(.leading, 10)
         .padding(.trailing, 14)
