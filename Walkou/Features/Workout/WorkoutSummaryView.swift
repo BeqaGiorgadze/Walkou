@@ -13,6 +13,7 @@ struct WorkoutSummaryView: View {
     @State private var saved = false
     @State private var healthStatus: HealthStatus = .idle
     @State private var lifetimePointsBefore = 0
+    @State private var jarsBefore = 0
     @State private var levelUp: GemLevel?
     @State private var showCollection = false
 
@@ -37,11 +38,21 @@ struct WorkoutSummaryView: View {
                         .clipShape(RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous))
                 }
                 goalCard
+                if hasData {
+                    SweatJarCard(
+                        steps: session.steps,
+                        goal: session.plan.goalSteps,
+                        activity: session.plan.activity,
+                        date: session.startDate ?? Date(),
+                        jarsBefore: jarsBefore
+                    )
+                }
                 if !session.gems.isEmpty {
                     GemHaulCard(
                         collected: { session.gemsCollected($0) },
                         available: { session.gemsAvailable($0) },
-                        points: session.gemPoints,
+                        // Crystal points are shown on the jar card.
+                        points: session.gemPoints - session.gemTally[.crystal] * GemKind.crystal.points,
                         bonusSteps: session.bonusSteps,
                         bonusDetours: session.gems.filter { $0.isCollected && $0.detourSteps != nil }.count,
                         lifetimePoints: lifetimePointsBefore + session.gemPoints
@@ -201,6 +212,7 @@ struct WorkoutSummaryView: View {
         guard !saved else { return }
         let earlier = (try? modelContext.fetch(FetchDescriptor<WorkoutRecord>())) ?? []
         lifetimePointsBefore = earlier.reduce(0) { $0 + $1.gemPoints }
+        jarsBefore = SweatJar.lifetimeSealed(earlier)
         guard hasData, let start = session.startDate else { return }
         saved = true
         let end = session.endDate ?? Date()

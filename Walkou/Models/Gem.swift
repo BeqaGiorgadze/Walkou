@@ -8,6 +8,8 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
     case bonus
     case rare
     case legendary
+    /// A sealed sweat jar crystallizes into one of these.
+    case crystal
     // Special rare finds shown on the collection shelf.
     case heart
     case amber
@@ -22,7 +24,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
         case .common: return 1
         case .bonus: return 3
         case .rare, .heart, .amber, .shard, .cushion: return 5
-        case .legendary: return 10
+        case .legendary, .crystal: return 10
         }
     }
 
@@ -32,6 +34,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
         case .bonus: return "GemBonus"
         case .rare: return "GemRare"
         case .legendary: return "GemLegendary"
+        case .crystal: return "GemCrystal"
         case .heart: return "GemHeart"
         case .amber: return "GemAmber"
         case .shard: return "GemShard"
@@ -46,6 +49,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
         case .bonus: return "BONUS GEM"
         case .rare: return "RARE GEM"
         case .legendary: return "LEGENDARY"
+        case .crystal: return "SWEAT CRYSTAL"
         case .heart: return "SAPPHIRE HEART"
         case .amber: return "AMBER DROP"
         case .shard: return "RUBY SHARD"
@@ -60,6 +64,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
         case .bonus: return "Green Kite"
         case .rare: return "Pink Crystal"
         case .legendary: return "Gold Diamond"
+        case .crystal: return "Sweat Crystal"
         case .heart: return "Sapphire Heart"
         case .amber: return "Amber Drop"
         case .shard: return "Ruby Shard"
@@ -74,6 +79,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
         case .bonus, .cushion: return Color(hex: 0x1FB863)
         case .rare, .shard: return Color(hex: 0xE8337E)
         case .legendary: return Color(hex: 0xFFB020)
+        case .crystal: return Color(hex: 0x4FC3FF)
         case .amber: return Color(hex: 0xE86A00)
         }
     }
@@ -82,7 +88,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
     var mapSize: CGFloat {
         switch self {
         case .common: return 24
-        case .bonus, .rare, .heart, .amber, .shard, .cushion: return 30
+        case .bonus, .rare, .heart, .amber, .shard, .cushion, .crystal: return 30
         case .legendary: return 38
         }
     }
@@ -90,7 +96,7 @@ enum GemKind: String, Codable, CaseIterable, Identifiable {
     var isSeasonal: Bool { self == .shard || self == .cushion }
 
     /// Order used on the shelf and in summaries.
-    static let shelfOrder: [GemKind] = [.common, .rare, .legendary, .bonus, .heart, .amber, .shard, .cushion]
+    static let shelfOrder: [GemKind] = [.common, .rare, .legendary, .crystal, .bonus, .heart, .amber, .shard, .cushion]
     static let haulOrder: [GemKind] = [.common, .rare, .legendary, .bonus]
 
     /// Kinds counted together in summaries (specials count as rare).

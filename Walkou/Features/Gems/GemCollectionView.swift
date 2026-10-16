@@ -115,7 +115,7 @@ struct GemCollectionView: View {
                 .font(.system(size: 11, weight: .semibold))
                 .multilineTextAlignment(.center)
                 .lineLimit(2, reservesSpace: true)
-            Text(found ? "×\(count)" : (kind.isSeasonal ? "🔒 Seasonal" : "Not found"))
+            Text(found ? "×\(count)" : (kind.isSeasonal ? "🔒 Seasonal" : kind == .crystal ? "Seal a jar" : "Not found"))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(found ? Theme.indigo : Theme.textSecondary)
         }

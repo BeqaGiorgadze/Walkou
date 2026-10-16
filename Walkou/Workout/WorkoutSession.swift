@@ -54,6 +54,13 @@ final class WorkoutSession: Identifiable {
     private(set) var lastCollect: GemCollectEvent?
     private(set) var goldGemAtStart = false
 
+    // Sweat jar
+    /// Jars sealed so far this workout (one per goal's worth of steps, up to 3).
+    private(set) var sealedJars = 0
+    private(set) var lastJarSeal: Date?
+    /// Last time the step count went up, so Kou stops walking when you do.
+    private(set) var lastMoveDate: Date?
+
     private(set) var voiceEnabled: Bool
     let offRouteAlertsEnabled: Bool
     /// Test autopilot settings; nil for a real walk.
@@ -122,6 +129,9 @@ final class WorkoutSession: Identifiable {
     var calories: Double { distance / 1000 * plan.activity.kilocaloriesPerKilometer }
 
     var gemPoints: Int { gemTally.points }
+
+    /// How full the jar being filled right now is.
+    var currentJarFill: Double { SweatJar.currentJarFill(steps: steps, goal: plan.goalSteps) }
 
     /// Meters to the closest gem not yet collected (for the "45 m" hint).
     var nearestGemDistance: Double? {
@@ -351,7 +361,9 @@ final class WorkoutSession: Identifiable {
         let counted = stepsBeforePause + segmentSteps
         // Without motion access (or in the simulator) fall back to the fixed-stride estimate.
         let estimated = plan.activity.steps(forDistance: distance)
-        steps = counted > 0 ? counted : (distance > 30 ? estimated : 0)
+        let newSteps = counted > 0 ? counted : (distance > 30 ? estimated : 0)
+        if newSteps > steps, phase == .active { lastMoveDate = Date() }
+        if newSteps != steps { steps = newSteps }
         checkMilestones()
     }
 
@@ -383,12 +395,33 @@ final class WorkoutSession: Identifiable {
             showCelebration = true
             showHalfwayCard = false
             Haptics.success()
-            voice.say("You rock! You just hit \(Format.steps(plan.goalSteps)) steps. Go the extra mile, you can do it!", interrupt: true)
+            voice.say("You rock! You just hit \(Format.steps(plan.goalSteps)) steps and sealed your sweat jar. Go the extra mile, you can do it!", interrupt: true)
             NotificationService.notifyIfInBackground(
                 title: "Goal reached! You rock! 🎉",
                 body: "\(Format.steps(plan.goalSteps)) steps done. Go the extra mile, you can do it!"
             )
         }
+
+        sealJarsIfNeeded()
+    }
+
+    /// Every goal's worth of steps seals a jar, which crystallizes into a Sweat Crystal.
+    private func sealJarsIfNeeded() {
+        let jars = SweatJar.sealed(steps: steps, goal: plan.goalSteps)
+        guard jars > sealedJars else { return }
+        let first = sealedJars == 0
+        for _ in sealedJars..<jars { gemTally[.crystal] += 1 }
+        sealedJars = jars
+        lastJarSeal = Date()
+        lastCollect = GemCollectEvent(kind: .crystal, points: GemKind.crystal.points)
+        SoundEffects.play(.jarSeal)
+        // The first jar is announced with the goal; extra jars get their own moment.
+        guard !first else { return }
+        Haptics.success()
+        voice.say(jars >= SweatJar.maxPerWorkout
+                  ? "Third jar sealed! That's the most jars in one workout. Legendary!"
+                  : "Second jar sealed! Kou can't believe it. Keep going!")
+        NotificationService.notifyIfInBackground(title: "Another jar sealed! 🫙", body: "That's \(jars) sweat jars in one workout.")
     }
 
     private func updateNavigation(with location: CLLocation) {

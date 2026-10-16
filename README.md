@@ -18,6 +18,14 @@ A native iOS app (SwiftUI, iOS 17+) for walking and running toward a step goal.
 
 Walk within ~25 m of a gem to collect it (not counted above 25 km/h). Free walks spawn gems ahead of you, and at halfway a gold gem appears at your start. Points add up to levels (Walker → Explorer → Pathfinder → Trailblazer → Legend), and the collection shelf shows everything you've found. Gem artwork lives in `Assets.xcassets/Gems`, and sounds in `Resources/Sounds`.
 
+**🫙 Sweat jars and Kou.** Kou, the mascot, walks or runs next to your step count, and their sweat flies into a jar that fills toward your goal:
+- Reach the goal and the jar is **sealed**. It crystallizes into a **Sweat Crystal** (10 pts).
+- Each extra goal's worth of steps seals another jar, up to 3 per workout.
+- Sealed jars make Kou fitter: Couch Bean → Warming Up (3 jars, headband) → Getting Fit (10) → Athlete (30) → Legend (100).
+- Home shows today's jar (tilt the phone and it sloshes). **Kou's Pantry** shows every jar you've filled.
+
+Kou is drawn in code for now. See [docs/MASCOT_RIVE.md](docs/MASCOT_RIVE.md) to animate Kou in Rive.
+
 Workouts are saved on the device (SwiftData) and appear under **Activity**. They can also be saved to Apple Health (see below).
 
 ## Running it
@@ -84,7 +92,7 @@ Walkou/
   Services/       Location, pedometer, MapKit route planner, HealthKit, voice, notifications
   Workout/        WorkoutSession (live workout engine), RouteTracker, geo math
   Features/       Onboarding, Home, Plan (goal + route picker), Workout (live, celebration, summary),
-                  History, Settings
+                  History, Settings, Gems, Mascot (Kou, sweat jars, Pantry)
   Resources/      Info.plist, entitlements, asset catalog
 WalkouTests/      Unit tests for route tracking, geo math and formatting
 scripts/          generate_project.rb: regenerates Walkou.xcodeproj

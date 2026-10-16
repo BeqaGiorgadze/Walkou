@@ -10,12 +10,14 @@ enum SoundEffects {
         case gemRare = "gem_rare"
         case gemLegendary = "gem_legendary"
         case levelUp = "level_up"
+        case jarSeal = "jar_seal"
 
         static func forGem(_ kind: GemKind) -> Effect {
             switch kind {
             case .common: return .gemCommon
             case .bonus: return .gemBonus
             case .legendary: return .gemLegendary
+            case .crystal: return .jarSeal
             case .rare, .heart, .amber, .shard, .cushion: return .gemRare
             }
         }
@@ -25,7 +27,7 @@ enum SoundEffects {
 
     /// Loads all chimes so the first gem doesn't stall while a file is decoded.
     static func preload() {
-        for effect in [Effect.gemCommon, .gemBonus, .gemRare, .gemLegendary, .levelUp] { _ = player(for: effect) }
+        for effect in [Effect.gemCommon, .gemBonus, .gemRare, .gemLegendary, .levelUp, .jarSeal] { _ = player(for: effect) }
     }
 
     private static func player(for effect: Effect) -> AVAudioPlayer? {

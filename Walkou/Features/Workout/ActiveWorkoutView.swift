@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import MapKit
 import CoreLocation
 
@@ -7,6 +8,7 @@ struct ActiveWorkoutView: View {
     let session: WorkoutSession
 
     @Environment(AppModel.self) private var model
+    @Query private var workouts: [WorkoutRecord]
     @State private var camera: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
     @State private var showEndDialog = false
     /// Last position the camera was moved to while following the autopilot.
@@ -54,6 +56,8 @@ struct ActiveWorkoutView: View {
             if session.showCelebration {
                 CelebrationView(
                     goalSteps: session.plan.goalSteps,
+                    stage: mascotStage,
+                    liquid: SweatJar.liquid(for: session.plan.activity),
                     onKeepGoing: {
                         withAnimation(.spring) { session.showCelebration = false }
                     },
@@ -93,6 +97,23 @@ struct ActiveWorkoutView: View {
     private var isCountingDown: Bool {
         if case .countdown = session.phase { return true }
         return false
+    }
+
+    /// Kou's look includes the jars sealed in this workout.
+    private var mascotStage: MascotStage {
+        MascotStage.forJars(SweatJar.lifetimeSealed(workouts) + session.sealedJars)
+    }
+
+    private var mascotPose: MascotPose {
+        switch session.phase {
+        case .countdown: return .ready
+        case .paused: return .rest
+        case .finished: return .idle
+        case .active:
+            let speed = session.currentLocation?.speed ?? -1
+            if session.plan.activity == .run { return speed < 0 || speed > 1.2 ? .run : .walk }
+            return speed > 2.6 ? .run : .walk
+        }
     }
 
     // MARK: - Top
@@ -209,14 +230,18 @@ struct ActiveWorkoutView: View {
 
     private var bottomPanel: some View {
         VStack(spacing: 18) {
-            HStack(spacing: 18) {
-                ZStack {
-                    ProgressRing(progress: session.goalProgress, lineWidth: 9, tint: Theme.mint, track: .white.opacity(0.12))
-                    Image(systemName: session.goalReached ? "trophy.fill" : "shoeprints.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(session.goalReached ? Color(hex: 0xFFC53D) : Theme.mint)
-                }
-                .frame(width: 72, height: 72)
+            HStack(spacing: 14) {
+                SweatBuddyView(
+                    basePose: mascotPose,
+                    stage: mascotStage,
+                    sweat: min(1, 0.15 + session.goalProgress * 1.1),
+                    jarFill: session.currentJarFill,
+                    liquid: SweatJar.liquid(for: session.plan.activity),
+                    sealedJars: session.sealedJars,
+                    lastSeal: session.lastJarSeal,
+                    lastMove: session.lastMoveDate
+                )
+                .frame(width: 124, height: 88)
 
                 VStack(alignment: .leading, spacing: 0) {
                     Text("STEPS")

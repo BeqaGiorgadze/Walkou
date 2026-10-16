@@ -3,6 +3,8 @@ import SwiftUI
 /// "You rock!" moment when the step goal is reached mid-workout.
 struct CelebrationView: View {
     let goalSteps: Int
+    let stage: MascotStage
+    let liquid: Color
     var onKeepGoing: () -> Void
     var onFinish: () -> Void
 
@@ -23,9 +25,14 @@ struct CelebrationView: View {
 
             VStack(spacing: 22) {
                 Spacer()
-                BadgeIcon(symbol: "trophy.fill", colors: [Color(hex: 0xFFD25A), Color(hex: 0xFF9F1C)], size: 120)
-                    .scaleEffect(appeared ? 1 : 0.3)
-                    .rotationEffect(.degrees(appeared ? 0 : -30))
+                HStack(alignment: .bottom, spacing: 18) {
+                    SweatJarView(fill: 1, liquid: liquid, sealed: true, label: "GOAL!", onDark: true)
+                        .frame(height: 104)
+                        .rotationEffect(.degrees(appeared ? -6 : -40))
+                    MascotView(pose: .cheer, stage: stage, sweat: 1)
+                        .frame(width: 130, height: 156)
+                }
+                .scaleEffect(appeared ? 1 : 0.3)
 
                 VStack(spacing: 10) {
                     Text("YOU ROCK!")
@@ -34,6 +41,10 @@ struct CelebrationView: View {
                         .lineLimit(1)
                     Text("\(Format.steps(goalSteps)) steps done")
                         .font(.system(size: 22, weight: .bold))
+                    Text("Jar sealed! It crystallized into a Sweat Crystal · +\(GemKind.crystal.points) pts")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color(hex: 0xFFE59A))
+                        .multilineTextAlignment(.center)
                     Text("Go the extra mile. You can do it! 💪")
                         .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(.white.opacity(0.9))

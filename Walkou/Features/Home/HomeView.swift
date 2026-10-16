@@ -18,6 +18,12 @@ struct HomeView: View {
                     header
                     todayCard
                     NavigationLink {
+                        PantryView()
+                    } label: {
+                        MascotCard(jars: SweatJar.lifetimeSealed(workouts), workedOutToday: workoutStepsToday > 0)
+                    }
+                    .buttonStyle(.plain)
+                    NavigationLink {
                         GemCollectionView()
                     } label: {
                         GemLevelCard(points: lifetimeGemPoints, recentKinds: recentGemKinds)
@@ -82,13 +88,13 @@ struct HomeView: View {
                     .foregroundStyle(.white.opacity(0.8))
             }
             Spacer(minLength: 0)
-            ZStack {
-                ProgressRing(progress: progress, lineWidth: 12, tint: .white, track: .white.opacity(0.25))
+            VStack(spacing: 4) {
+                TodayJarView(fill: progress)
+                    .frame(height: 92)
                 Text("\(Int(min(progress, 9.99) * 100))%")
-                    .font(.number(18, weight: .bold))
+                    .font(.number(15, weight: .bold))
                     .foregroundStyle(.white)
             }
-            .frame(width: 92, height: 92)
         }
         .card(Theme.indigo, padding: 22)
     }
